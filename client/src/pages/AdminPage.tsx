@@ -14,6 +14,7 @@ import {
   Plus,
   UserCheck,
   ShieldCheck,
+  QrCode,
 } from 'lucide-react';
 import { api } from '../services/api.js';
 import {
@@ -175,6 +176,17 @@ export const AdminPage: React.FC = () => {
 
         {/* Global Action Controls with Declarative <Can> guards */}
         <div className="flex flex-wrap items-center gap-3">
+          {/* Abrir Scanner en Puerta: Declarative RBAC permission */}
+          <Can do="scanner:access">
+            <Link
+              to="/scanner"
+              className="flex items-center space-x-2 px-3.5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider transition-all active:scale-95 shadow-[0_0_20px_rgba(16,185,129,0.25)]"
+            >
+              <QrCode className="w-4 h-4" />
+              <span>Abrir Scanner</span>
+            </Link>
+          </Can>
+
           {/* Create Event Button: Declarative without manual ifs */}
           <Can do="events:create">
             <button

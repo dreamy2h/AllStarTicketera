@@ -52,17 +52,17 @@ export const HomePage: React.FC = () => {
 
         {/* Quick action buttons */}
         <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
-          <Link
-            to="/scanner"
-            className="flex items-center space-x-2 px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-[0_0_25px_rgba(16,185,129,0.3)] active:scale-95 transition-all"
+          <a
+            href="#eventos"
+            className="flex items-center space-x-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-allstar-gold to-amber-600 hover:opacity-95 text-black font-extrabold text-sm shadow-gold active:scale-95 transition-all"
           >
-            <QrCode className="w-4 h-4" />
-            <span>Abrir Scanner en Puerta</span>
-          </Link>
+            <Calendar className="w-4 h-4" />
+            <span>Ver Eventos Disponibles</span>
+          </a>
 
           <Link
             to="/admin"
-            className="flex items-center space-x-2 px-6 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-bold text-sm active:scale-95 transition-all"
+            className="flex items-center space-x-2 px-6 py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-700/80 text-white font-bold text-sm active:scale-95 transition-all shadow-md"
           >
             <LayoutDashboard className="w-4 h-4 text-allstar-gold" />
             <span>Panel de Socios & Admin</span>
@@ -71,7 +71,7 @@ export const HomePage: React.FC = () => {
       </div>
 
       {/* Active Events Section */}
-      <div className="space-y-6">
+      <div id="eventos" className="space-y-6 scroll-mt-24">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold font-luxury text-white">Eventos Activos</h2>

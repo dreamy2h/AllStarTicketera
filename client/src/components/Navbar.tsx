@@ -13,6 +13,7 @@ import {
   Shield,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.js';
+import { Can } from './Can.js';
 
 export const Navbar: React.FC = () => {
   const location = useLocation();
@@ -68,21 +69,23 @@ export const Navbar: React.FC = () => {
               <span className="hidden sm:inline">Eventos</span>
             </Link>
 
-            {/* Scanner Link */}
-            <Link
-              to="/scanner"
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                isActive('/scanner')
-                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.2)]'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-              }`}
-            >
-              <QrCode className="w-3.5 h-3.5 text-emerald-400" />
-              <span className="hidden sm:inline">Scanner Puerta</span>
-              <span className="text-[9px] px-1 py-0.2 rounded bg-emerald-500/30 text-emerald-300 font-mono">
-                LIVE
-              </span>
-            </Link>
+            {/* Scanner Link - Only visible with scanner:access permission */}
+            <Can do="scanner:access">
+              <Link
+                to="/scanner"
+                className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                  isActive('/scanner')
+                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.2)]'
+                    : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <QrCode className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="hidden sm:inline">Scanner Puerta</span>
+                <span className="text-[9px] px-1 py-0.2 rounded bg-emerald-500/30 text-emerald-300 font-mono">
+                  LIVE
+                </span>
+              </Link>
+            </Can>
 
             {/* Admin / Partner Panel Link */}
             <Link

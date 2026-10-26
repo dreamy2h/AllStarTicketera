@@ -132,7 +132,7 @@ export const api = {
   async checkInTicket(ticketCode: string): Promise<CheckInResponse> {
     const res = await fetch(`${API_BASE}/tickets/check-in`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify({ ticketCode }),
     });
     const data = await res.json();
