@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import { Permission } from '../models/Permission.js';
+import { Role } from '../models/Role.js';
 import { User } from '../models/User.js';
 import { Event } from '../models/Event.js';
 import { TicketType } from '../models/TicketType.js';
@@ -15,24 +17,124 @@ export const seedDatabase = async (): Promise<void> => {
       return;
     }
 
-    console.log('🌱 Sembrando datos iniciales con roles, permisos y usuarios...');
+    console.log('🌱 Sembrando catálogo dinámico de Permisos y Roles en MongoDB...');
 
+    // 1. Catálogo de Permisos
+    const permissionsData = [
+      // Eventos
+      {
+        code: 'events:view',
+        name: 'Ver Eventos y Aforos',
+        category: 'Eventos',
+        description: 'Permite visualizar detalles, recintos y cupos de los eventos.',
+      },
+      {
+        code: 'events:create',
+        name: 'Crear y Editar Eventos',
+        category: 'Eventos',
+        description: 'Permite publicar cumbres, configurar fechas, lugares y tipos de ticket.',
+      },
+      // Socios
+      {
+        code: 'prospects:invite',
+        name: 'Invitar Prospectos & Pases',
+        category: 'Socios',
+        description: 'Permite usar el enlace de referido propio y emitir pases de abordaje.',
+      },
+      {
+        code: 'partners:manage',
+        name: 'Gestionar y Crear Socios',
+        category: 'Socios',
+        description: 'Permite acceder al mantenedor de socios y dar de alta nuevos miembros.',
+      },
+      {
+        code: 'roles:manage',
+        name: 'Gestionar Roles y Permisos',
+        category: 'Seguridad',
+        description: 'Permite crear nuevos roles y reasignar matriz de permisos.',
+      },
+      // Control de Puerta
+      {
+        code: 'scanner:access',
+        name: 'Operar Scanner en Puerta',
+        category: 'Acceso',
+        description: 'Permite validar códigos QR de entrada y hacer check-in con cámara.',
+      },
+      // Analítica y Reportes
+      {
+        code: 'metrics:view',
+        name: 'Ver Analíticas Globales',
+        category: 'Reportes',
+        description: 'Permite ver estadísticas en tiempo real y tabla de liderazgo.',
+      },
+      {
+        code: 'metrics:export',
+        name: 'Exportar Lista a CSV/Excel',
+        category: 'Reportes',
+        description: 'Permite descargar el listado completo de asistentes con datos de contacto.',
+      },
+    ];
+
+    const permissions = await Permission.insertMany(permissionsData);
+    const permMap = new Map<string, mongoose.Types.ObjectId>();
+    permissions.forEach((p) => permMap.set(p.code, p._id as mongoose.Types.ObjectId));
+
+    // 2. Roles del Sistema
+    const adminRole = await Role.create({
+      name: 'Administrador Global',
+      slug: 'admin',
+      description: 'Acceso total sin restricciones a todas las funciones y configuraciones.',
+      permissions: Array.from(permMap.values()),
+      isSystem: true,
+    });
+
+    const leaderRole = await Role.create({
+      name: 'Líder de Organización',
+      slug: 'leader',
+      description: 'Líder con permiso para registrar socios en su equipo, invitar y ver métricas.',
+      permissions: [
+        permMap.get('prospects:invite')!,
+        permMap.get('partners:manage')!,
+        permMap.get('events:view')!,
+        permMap.get('scanner:access')!,
+        permMap.get('metrics:view')!,
+        permMap.get('metrics:export')!,
+      ],
+      isSystem: true,
+    });
+
+    const partnerRole = await Role.create({
+      name: 'Socio Promotor',
+      slug: 'partner',
+      description: 'Socio general enfocado en prospección, invitaciones y emisión de pases.',
+      permissions: [
+        permMap.get('prospects:invite')!,
+        permMap.get('events:view')!,
+      ],
+      isSystem: true,
+    });
+
+    const staffRole = await Role.create({
+      name: 'Coordinador de Puerta',
+      slug: 'reception_staff',
+      description: 'Equipo de recepción asignado únicamente a escanear tickets en puerta.',
+      permissions: [
+        permMap.get('scanner:access')!,
+        permMap.get('events:view')!,
+      ],
+      isSystem: false,
+    });
+
+    // 3. Usuarios con referencia a Roles
     const defaultPassword = 'AllStar2026!';
 
-    // 1. Usuarios con Roles y Permisos Granulares
     const users = await User.create([
       {
         fullName: 'Zamyr Pedreros',
         email: 'zamyr@allstarticket.com',
         password: defaultPassword,
+        roleId: adminRole._id,
         role: 'admin',
-        permissions: [
-          'invite_prospects',
-          'manage_partners',
-          'create_events',
-          'view_metrics',
-          'door_scanner',
-        ],
         referralCode: 'zamyr',
         phone: '+57 300 123 4567',
         isActive: true,
@@ -41,13 +143,8 @@ export const seedDatabase = async (): Promise<void> => {
         fullName: 'Andrea Gómez',
         email: 'andrea.gomez@allstarticket.com',
         password: defaultPassword,
+        roleId: leaderRole._id,
         role: 'leader',
-        permissions: [
-          'invite_prospects',
-          'manage_partners',
-          'view_metrics',
-          'door_scanner',
-        ],
         referralCode: 'andrea',
         phone: '+57 311 987 6543',
         isActive: true,
@@ -56,8 +153,8 @@ export const seedDatabase = async (): Promise<void> => {
         fullName: 'Carlos Mendoza',
         email: 'carlos.m@allstarticket.com',
         password: defaultPassword,
+        roleId: partnerRole._id,
         role: 'partner',
-        permissions: ['invite_prospects'],
         referralCode: 'carlos',
         phone: '+1 786 555 0192',
         isActive: true,
@@ -66,8 +163,8 @@ export const seedDatabase = async (): Promise<void> => {
         fullName: 'Sofía Valenzuela',
         email: 'sofia.v@allstarticket.com',
         password: defaultPassword,
+        roleId: partnerRole._id,
         role: 'partner',
-        permissions: ['invite_prospects'],
         referralCode: 'sofia',
         phone: '+52 55 4123 8899',
         isActive: true,
@@ -78,9 +175,9 @@ export const seedDatabase = async (): Promise<void> => {
     const andreaUser = users[1];
     const carlosUser = users[2];
 
-    // 2. Evento Principal
+    // 4. Evento Principal
     const eventDate = new Date();
-    eventDate.setDate(eventDate.getDate() + 30); // 30 days from now
+    eventDate.setDate(eventDate.getDate() + 30);
     eventDate.setHours(18, 30, 0, 0);
 
     const mainEvent = await Event.create({
@@ -99,7 +196,7 @@ export const seedDatabase = async (): Promise<void> => {
       isActive: true,
     });
 
-    // 3. Tipos de Ticket
+    // 5. Tipos de Ticket
     const ticketTypes = await TicketType.create([
       {
         eventId: mainEvent._id,
@@ -124,7 +221,7 @@ export const seedDatabase = async (): Promise<void> => {
     const freePass = ticketTypes[0];
     const vipPass = ticketTypes[2];
 
-    // 4. Muestra de Tickets
+    // 6. Muestra de Tickets
     const demoCheckedInTime = new Date();
     demoCheckedInTime.setMinutes(demoCheckedInTime.getMinutes() - 15);
 
@@ -163,11 +260,9 @@ export const seedDatabase = async (): Promise<void> => {
     ]);
 
     console.log('✅ Seed completado con éxito:');
-    console.log(`   - 4 Socios/Admins creados con contraseña: "${defaultPassword}"`);
-    console.log(`     • Zamyr Pedreros: role 'admin' (todos los permisos)`);
-    console.log(`     • Andrea Gómez: role 'leader' (permisos: invitar, crear socios, métricas, scanner)`);
-    console.log(`     • Carlos Mendoza: role 'partner' (permiso: invitar prospectos)`);
-    console.log(`     • Sofía Valenzuela: role 'partner' (permiso: invitar prospectos)`);
+    console.log(`   - ${permissions.length} Permisos creados en la colección 'permissions'`);
+    console.log(`   - 4 Roles creados en la colección 'roles' (Admin, Líder, Socio, Coordinador Puerta)`);
+    console.log(`   - 4 Usuarios con roles dinámicos asignados (Contraseña: ${defaultPassword})`);
   } catch (error) {
     console.error('❌ Error al sembrar datos:', error);
   }

@@ -78,6 +78,7 @@ docker compose up --build
 Una vez levantado:
 - 🌐 **Frontend (Web App):** [http://localhost:3000](http://localhost:3000)
 - 🔌 **Backend API:** [http://localhost:5000/api](http://localhost:5000/api)
+- 📊 **Visualizador DB (Mongo Express):** [http://localhost:8081](http://localhost:8081) *(explora y edita datos en tu navegador sin instalar nada)*
 - 🗄️ **MongoDB:** `mongodb://localhost:27017/allstar_tickets`
 
 > **Nota:** La base de datos se siembra automáticamente al iniciar por primera vez con socios de prueba, un evento principal y tickets de demostración.

@@ -58,6 +58,24 @@ services:
     networks:
       - allstar-network
 
+  # Visualizador Web de Base de Datos (Mongo Express)
+  mongo-express:
+    image: mongo-express:latest
+    container_name: allstar-mongo-express
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongo
+      - ME_CONFIG_MONGODB_PORT=27017
+      - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
+      - ME_CONFIG_BASICAUTH=false
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - allstar-network
+
 networks:
   allstar-network:
     driver: bridge

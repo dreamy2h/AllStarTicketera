@@ -13,6 +13,7 @@ import {
   Lock,
   Plus,
   UserCheck,
+  ShieldCheck,
 } from 'lucide-react';
 import { api } from '../services/api.js';
 import {
@@ -27,13 +28,15 @@ import { AttendeeTable } from '../components/AttendeeTable.js';
 import { ManualTicketModal } from '../components/ManualTicketModal.js';
 import { BoardingPass } from '../components/BoardingPass.js';
 import { PartnerManagement } from '../components/PartnerManagement.js';
+import { RoleManagement } from '../components/RoleManagement.js';
 import { CreateEventModal } from '../components/CreateEventModal.js';
+import { Can } from '../components/Can.js';
 import { useAuth } from '../context/AuthContext.js';
 
 export const AdminPage: React.FC = () => {
-  const { user: currentUser, canManagePartners, canCreateEvents, canViewMetrics } = useAuth();
+  const { user: currentUser } = useAuth();
 
-  const [activeTab, setActiveTab] = useState<'metrics' | 'partners' | 'my_invites'>('metrics');
+  const [activeTab, setActiveTab] = useState<'metrics' | 'partners' | 'roles' | 'my_invites'>('metrics');
   const [events, setEvents] = useState<EventItem[]>([]);
   const [selectedEventId, setSelectedEventId] = useState<string>('');
   const [stats, setStats] = useState<EventStatsData | null>(null);
@@ -63,13 +66,12 @@ export const AdminPage: React.FC = () => {
           setSelectedEventId(eventsData[0]._id);
         }
 
-        // If user is authenticated, fetch partners list for dropdowns
         if (currentUser) {
           try {
             const partnersData = await api.getPartners();
             setPartners(partnersData);
           } catch (e) {
-            // Non-critical if partner doesn't have list permission
+            // Non-critical if user doesn't have partners:manage
           }
         }
       } catch (err: any) {
@@ -93,7 +95,6 @@ export const AdminPage: React.FC = () => {
       setIsRefreshing(true);
       const currentEvent = events.find((e) => e._id === eventId);
 
-      // Fetch stats and attendees if authenticated
       if (currentUser) {
         const [statsRes, attendeesRes, eventDetails] = await Promise.all([
           api.getEventStats(eventId).catch(() => null),
@@ -161,7 +162,7 @@ export const AdminPage: React.FC = () => {
         <div>
           <div className="flex items-center space-x-2">
             <span className="text-xs font-mono text-allstar-gold uppercase tracking-widest font-bold">
-              PLATAFORMA PRIVADA • {currentUser.role.toUpperCase()}
+              PLATAFORMA PRIVADA • {currentUser.roleName || currentUser.role}
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold font-luxury text-white">
@@ -172,10 +173,10 @@ export const AdminPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Global Action Controls */}
+        {/* Global Action Controls with Declarative <Can> guards */}
         <div className="flex flex-wrap items-center gap-3">
-          {/* Create Event Button (Only users with create_events permission) */}
-          {canCreateEvents && (
+          {/* Create Event Button: Declarative without manual ifs */}
+          <Can do="events:create">
             <button
               onClick={() => setShowCreateEventModal(true)}
               className="flex items-center space-x-2 px-3.5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs uppercase tracking-wider transition-all active:scale-95 shadow-md"
@@ -183,9 +184,9 @@ export const AdminPage: React.FC = () => {
               <Plus className="w-4 h-4" />
               <span>Crear Evento</span>
             </button>
-          )}
+          </Can>
 
-          {/* Emit Manual Ticket Button (Available for all partners) */}
+          {/* Emit Manual Ticket Button: Available for all partners */}
           <button
             onClick={() => setShowManualModal(true)}
             className="flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-allstar-gold to-amber-600 text-black font-bold text-xs uppercase tracking-wider shadow-gold hover:opacity-95 active:scale-95 transition-all"
@@ -207,21 +208,23 @@ export const AdminPage: React.FC = () => {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex items-center space-x-2 border-b border-white/10 pb-2">
-        <button
-          onClick={() => setActiveTab('metrics')}
-          className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'metrics'
-              ? 'bg-allstar-gold text-black shadow-gold'
-              : 'text-slate-300 hover:bg-white/5'
-          }`}
-        >
-          <BarChart3 className="w-4 h-4" />
-          <span>Métricas Globales & Puerta</span>
-        </button>
+      <div className="flex flex-wrap items-center gap-2 border-b border-white/10 pb-2">
+        <Can do="metrics:view">
+          <button
+            onClick={() => setActiveTab('metrics')}
+            className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+              activeTab === 'metrics'
+                ? 'bg-allstar-gold text-black shadow-gold'
+                : 'text-slate-300 hover:bg-white/5'
+            }`}
+          >
+            <BarChart3 className="w-4 h-4" />
+            <span>Métricas Globales</span>
+          </button>
+        </Can>
 
-        {/* Mantenedor de Socios Tab (Guarded by canManagePartners) */}
-        {canManagePartners && (
+        {/* Mantenedor de Socios Tab: Declarative <Can do="partners:manage"> */}
+        <Can do="partners:manage">
           <button
             onClick={() => setActiveTab('partners')}
             className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
@@ -232,11 +235,26 @@ export const AdminPage: React.FC = () => {
           >
             <Users className="w-4 h-4" />
             <span>Mantenedor de Socios</span>
-            <span className="text-[10px] px-1.5 py-0.2 rounded bg-sky-950 text-sky-300 border border-sky-600/40 font-mono">
-              Líder/Admin
+          </button>
+        </Can>
+
+        {/* Roles & Permisos Tab: Declarative <Can do="roles:manage"> */}
+        <Can do="roles:manage">
+          <button
+            onClick={() => setActiveTab('roles')}
+            className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+              activeTab === 'roles'
+                ? 'bg-allstar-gold text-black shadow-gold'
+                : 'text-slate-300 hover:bg-white/5'
+            }`}
+          >
+            <ShieldCheck className="w-4 h-4" />
+            <span>Roles & Permisos (RBAC)</span>
+            <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-950 text-amber-300 border border-amber-600/40 font-mono">
+              MongoDB
             </span>
           </button>
-        )}
+        </Can>
 
         {/* My Invites Tab */}
         <button
@@ -255,7 +273,6 @@ export const AdminPage: React.FC = () => {
       {/* TAB 1: Métricas & Asistentes */}
       {activeTab === 'metrics' && (
         <div className="space-y-8">
-          {/* Active Event Banner & Selector */}
           {activeEvent && (
             <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/10 flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center space-x-3">
@@ -294,7 +311,6 @@ export const AdminPage: React.FC = () => {
             </div>
           )}
 
-          {/* Real-time KPIs & Leaderboard */}
           {stats ? (
             <EventStats stats={stats} />
           ) : (
@@ -303,7 +319,6 @@ export const AdminPage: React.FC = () => {
             </div>
           )}
 
-          {/* Attendees Table */}
           <div className="space-y-4">
             <h2 className="text-lg font-bold font-luxury text-white">Todos los Asistentes al Evento</h2>
             <AttendeeTable
@@ -318,9 +333,20 @@ export const AdminPage: React.FC = () => {
       )}
 
       {/* TAB 2: Mantenedor de Socios */}
-      {activeTab === 'partners' && canManagePartners && <PartnerManagement />}
+      {activeTab === 'partners' && (
+        <Can do="partners:manage" fallback={<p className="text-rose-400">Acceso no autorizado.</p>}>
+          <PartnerManagement />
+        </Can>
+      )}
 
-      {/* TAB 3: Mis Invitados Directos */}
+      {/* TAB 3: Gestor de Roles y Permisos (MongoDB) */}
+      {activeTab === 'roles' && (
+        <Can do="roles:manage" fallback={<p className="text-rose-400">Acceso no autorizado.</p>}>
+          <RoleManagement />
+        </Can>
+      )}
+
+      {/* TAB 4: Mis Invitados Directos */}
       {activeTab === 'my_invites' && (
         <div className="space-y-4">
           <div className="p-4 rounded-2xl bg-sky-950/40 border border-sky-500/30 flex items-center justify-between flex-wrap gap-2">

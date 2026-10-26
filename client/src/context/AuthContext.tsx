@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User, Permission } from '../types/index.js';
+import { User } from '../types/index.js';
 import { api } from '../services/api.js';
 
 interface AuthContextType {
@@ -8,11 +8,14 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
-  hasPermission: (permission: Permission) => boolean;
+  can: (permissionCode: string) => boolean;
+  canAny: (permissionCodes: string[]) => boolean;
+  canAll: (permissionCodes: string[]) => boolean;
   canManagePartners: boolean;
   canCreateEvents: boolean;
   canViewMetrics: boolean;
   canScanTickets: boolean;
+  canManageRoles: boolean;
   isAdmin: boolean;
   isLeader: boolean;
   refreshUser: () => Promise<void>;
@@ -68,18 +71,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await fetchSession();
   };
 
-  const hasPermission = (permission: Permission): boolean => {
+  // Dynamic permission check: true if user is admin, has '*' or has explicit code
+  const can = (permissionCode: string): boolean => {
     if (!user) return false;
     if (user.role === 'admin') return true;
-    return Array.isArray(user.permissions) && user.permissions.includes(permission);
+    if (Array.isArray(user.permissions)) {
+      if (user.permissions.includes('*')) return true;
+      return user.permissions.includes(permissionCode.toLowerCase());
+    }
+    return false;
+  };
+
+  const canAny = (permissionCodes: string[]): boolean => {
+    return permissionCodes.some((code) => can(code));
+  };
+
+  const canAll = (permissionCodes: string[]): boolean => {
+    return permissionCodes.every((code) => can(code));
   };
 
   const isAdmin = user?.role === 'admin';
   const isLeader = user?.role === 'leader';
-  const canManagePartners = isAdmin || hasPermission('manage_partners');
-  const canCreateEvents = isAdmin || hasPermission('create_events');
-  const canViewMetrics = isAdmin || hasPermission('view_metrics');
-  const canScanTickets = isAdmin || hasPermission('door_scanner');
+  const canManagePartners = can('partners:manage');
+  const canCreateEvents = can('events:create');
+  const canViewMetrics = can('metrics:view');
+  const canScanTickets = can('scanner:access');
+  const canManageRoles = can('roles:manage');
 
   return (
     <AuthContext.Provider
@@ -89,11 +106,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isLoading,
         login,
         logout,
-        hasPermission,
+        can,
+        canAny,
+        canAll,
         canManagePartners,
         canCreateEvents,
         canViewMetrics,
         canScanTickets,
+        canManageRoles,
         isAdmin,
         isLeader,
         refreshUser,

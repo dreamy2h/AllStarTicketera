@@ -3,6 +3,7 @@ import eventRoutes from './eventRoutes.js';
 import ticketRoutes from './ticketRoutes.js';
 import userRoutes from './userRoutes.js';
 import authRoutes from './authRoutes.js';
+import roleRoutes from './roleRoutes.js';
 
 const apiRouter = Router();
 
@@ -10,6 +11,7 @@ apiRouter.use('/auth', authRoutes);
 apiRouter.use('/events', eventRoutes);
 apiRouter.use('/tickets', ticketRoutes);
 apiRouter.use('/users', userRoutes);
+apiRouter.use('/roles', roleRoutes);
 
 apiRouter.get('/health', (_req, res) => {
   res.json({

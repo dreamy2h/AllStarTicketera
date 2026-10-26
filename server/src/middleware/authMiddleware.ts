@@ -1,11 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { User, IUser, Permission, UserRole } from '../models/User.js';
+import { User, IUser } from '../models/User.js';
+import { IRole } from '../models/Role.js';
+import { IPermission } from '../models/Permission.js';
 
 export const JWT_SECRET = process.env.JWT_SECRET || 'allstar_super_secret_jwt_key_2026';
 
 export interface AuthenticatedRequest extends Request {
   user?: IUser;
+  userPermissions?: string[];
 }
 
 export const protect = async (
@@ -29,17 +32,45 @@ export const protect = async (
     }
 
     const decoded = jwt.verify(token, JWT_SECRET) as { id: string };
-    const user = await User.findById(decoded.id);
+    const user = await User.findById(decoded.id)
+      .populate({
+        path: 'roleId',
+        populate: { path: 'permissions' },
+      })
+      .populate('customPermissions');
 
     if (!user || !user.isActive) {
       res.status(401).json({
         success: false,
-        message: 'El usuario asociado a este token no existe o ha sido desactivado.',
+        message: 'El usuario no existe o ha sido desactivado.',
       });
       return;
     }
 
+    // Aggregate all permission codes from role and custom permissions
+    const permissionSet = new Set<string>();
+
+    if (user.roleId && typeof user.roleId === 'object') {
+      const role = user.roleId as IRole;
+      if (Array.isArray(role.permissions)) {
+        role.permissions.forEach((perm: any) => {
+          if (perm && perm.code) {
+            permissionSet.add(perm.code.toLowerCase());
+          }
+        });
+      }
+    }
+
+    if (Array.isArray(user.customPermissions)) {
+      user.customPermissions.forEach((perm: any) => {
+        if (perm && perm.code) {
+          permissionSet.add(perm.code.toLowerCase());
+        }
+      });
+    }
+
     req.user = user;
+    req.userPermissions = Array.from(permissionSet);
     next();
   } catch (error) {
     res.status(401).json({
@@ -49,8 +80,8 @@ export const protect = async (
   }
 };
 
-// Middleware to enforce specific permissions
-export const requirePermission = (permission: Permission) => {
+// Declarative middleware to protect endpoints by dynamic permission code
+export const requirePermission = (permissionCode: string) => {
   return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
     if (!req.user) {
       res.status(401).json({ success: false, message: 'Autenticación requerida.' });
@@ -58,31 +89,31 @@ export const requirePermission = (permission: Permission) => {
     }
 
     // Admins have all permissions implicitly
-    if (req.user.role === 'admin') {
+    if (req.user.role === 'admin' || req.userPermissions?.includes('*')) {
       return next();
     }
 
-    // Check if user has explicit permission
-    if (req.user.permissions && req.user.permissions.includes(permission)) {
+    const targetCode = permissionCode.toLowerCase();
+    if (req.userPermissions && req.userPermissions.includes(targetCode)) {
       return next();
     }
 
     res.status(403).json({
       success: false,
-      message: `Acceso denegado. No tienes el permiso requerido: "${permission}".`,
+      message: `Acceso denegado. Se requiere el permiso: "${permissionCode}".`,
+      requiredPermission: permissionCode,
     });
   };
 };
 
-// Middleware to enforce specific roles
-export const requireRole = (allowedRoles: UserRole[]) => {
+export const requireRole = (allowedRoles: string[]) => {
   return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
     if (!req.user) {
       res.status(401).json({ success: false, message: 'Autenticación requerida.' });
       return;
     }
 
-    if (allowedRoles.includes(req.user.role)) {
+    if (req.user.role === 'admin' || allowedRoles.includes(req.user.role)) {
       return next();
     }
 

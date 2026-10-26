@@ -13,43 +13,15 @@ import {
   X,
   UserCheck,
   CheckCircle2,
-  Power,
 } from 'lucide-react';
-import { User, Permission, UserRole, CreatePartnerPayload } from '../types/index.js';
+import { User, RoleItem, CreatePartnerPayload } from '../types/index.js';
 import { api } from '../services/api.js';
 import { useAuth } from '../context/AuthContext.js';
-
-const AVAILABLE_PERMISSIONS: { id: Permission; label: string; desc: string }[] = [
-  {
-    id: 'invite_prospects',
-    label: 'Invitar Prospectos',
-    desc: 'Generar links de referido y emitir pases de abordaje para invitados.',
-  },
-  {
-    id: 'manage_partners',
-    label: 'Gestionar Socios',
-    desc: 'Acceso al mantenedor de socios para registrar y configurar nuevos miembros.',
-  },
-  {
-    id: 'create_events',
-    label: 'Crear Eventos',
-    desc: 'Crear nuevas cumbres, conferencias, fechas y configurar tipos de entradas.',
-  },
-  {
-    id: 'view_metrics',
-    label: 'Ver Métricas Globales',
-    desc: 'Ver panel de analíticas en tiempo real y exportar listas a CSV/Excel.',
-  },
-  {
-    id: 'door_scanner',
-    label: 'Control de Puerta (Scanner)',
-    desc: 'Validar tickets en el acceso con la cámara del dispositivo móvil.',
-  },
-];
 
 export const PartnerManagement: React.FC = () => {
   const { user: currentUser, canManagePartners } = useAuth();
   const [partners, setPartners] = useState<User[]>([]);
+  const [availableRoles, setAvailableRoles] = useState<RoleItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRole, setSelectedRole] = useState('all');
@@ -65,8 +37,7 @@ export const PartnerManagement: React.FC = () => {
   const [newEmail, setNewEmail] = useState('');
   const [newReferralCode, setNewReferralCode] = useState('');
   const [newPhone, setNewPhone] = useState('');
-  const [newRole, setNewRole] = useState<UserRole>('partner');
-  const [newPermissions, setNewPermissions] = useState<Permission[]>(['invite_prospects']);
+  const [newRoleId, setNewRoleId] = useState<string>('');
   const [newPassword, setNewPassword] = useState('AllStar2026!');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [modalError, setModalError] = useState<string | null>(null);
@@ -75,14 +46,24 @@ export const PartnerManagement: React.FC = () => {
   const fetchPartners = async () => {
     try {
       setIsLoading(true);
-      const data = await api.getPartners({
-        search: searchTerm || undefined,
-        role: selectedRole !== 'all' ? selectedRole : undefined,
-        status: selectedStatus !== 'all' ? selectedStatus : undefined,
-      });
-      setPartners(data);
+      const [partnersData, rolesData] = await Promise.all([
+        api.getPartners({
+          search: searchTerm || undefined,
+          role: selectedRole !== 'all' ? selectedRole : undefined,
+          status: selectedStatus !== 'all' ? selectedStatus : undefined,
+        }),
+        api.getRoles(),
+      ]);
+      setPartners(partnersData);
+      setAvailableRoles(rolesData);
+
+      if (rolesData.length > 0 && !newRoleId) {
+        // Pre-select 'partner' role or first role
+        const defaultRole = rolesData.find((r) => r.slug === 'partner') || rolesData[0];
+        setNewRoleId(defaultRole._id);
+      }
     } catch (err: any) {
-      console.error('Error fetching partners:', err);
+      console.error('Error fetching partners and roles:', err);
     } finally {
       setIsLoading(false);
     }
@@ -92,55 +73,26 @@ export const PartnerManagement: React.FC = () => {
     fetchPartners();
   }, [searchTerm, selectedRole, selectedStatus]);
 
-  // Adjust default permissions when role changes in create modal
-  const handleRoleChange = (role: UserRole) => {
-    setNewRole(role);
-    if (role === 'admin') {
-      setNewPermissions([
-        'invite_prospects',
-        'manage_partners',
-        'create_events',
-        'view_metrics',
-        'door_scanner',
-      ]);
-    } else if (role === 'leader') {
-      setNewPermissions([
-        'invite_prospects',
-        'manage_partners',
-        'view_metrics',
-        'door_scanner',
-      ]);
-    } else {
-      setNewPermissions(['invite_prospects']);
-    }
-  };
-
-  const handleTogglePermission = (perm: Permission) => {
-    if (newPermissions.includes(perm)) {
-      setNewPermissions(newPermissions.filter((p) => p !== perm));
-    } else {
-      setNewPermissions([...newPermissions, perm]);
-    }
-  };
-
   const handleCreatePartner = async (e: React.FormEvent) => {
     e.preventDefault();
     setModalError(null);
 
-    if (!newFullName.trim() || !newEmail.trim() || !newReferralCode.trim()) {
-      setModalError('Nombre, correo y código de referido son obligatorios.');
+    if (!newFullName.trim() || !newEmail.trim() || !newReferralCode.trim() || !newRoleId) {
+      setModalError('Nombre, correo, código de referido y rol son obligatorios.');
       return;
     }
 
     try {
       setIsSubmitting(true);
+      const selectedRoleDoc = availableRoles.find((r) => r._id === newRoleId);
+
       const payload: CreatePartnerPayload = {
         fullName: newFullName.trim(),
         email: newEmail.trim(),
         referralCode: newReferralCode.trim().toLowerCase(),
         phone: newPhone.trim(),
-        role: newRole,
-        permissions: newPermissions,
+        roleId: newRoleId,
+        role: selectedRoleDoc?.slug || 'partner',
         password: newPassword,
       };
 
@@ -153,8 +105,6 @@ export const PartnerManagement: React.FC = () => {
       setNewEmail('');
       setNewReferralCode('');
       setNewPhone('');
-      setNewRole('partner');
-      setNewPermissions(['invite_prospects']);
       setNewPassword('AllStar2026!');
 
       fetchPartners();
@@ -175,8 +125,8 @@ export const PartnerManagement: React.FC = () => {
       await api.updatePartner(editingPartner._id, {
         fullName: editingPartner.fullName,
         phone: editingPartner.phone,
+        roleId: editingPartner.roleId,
         role: editingPartner.role,
-        permissions: editingPartner.permissions,
         isActive: editingPartner.isActive,
       });
 
@@ -203,7 +153,7 @@ export const PartnerManagement: React.FC = () => {
         <Lock className="w-12 h-12 text-rose-400 mx-auto mb-3" />
         <h3 className="text-xl font-bold font-luxury text-white">Acceso Restringido</h3>
         <p className="text-xs text-slate-400 mt-2">
-          No tienes el permiso <strong className="text-rose-300">"manage_partners"</strong> para acceder al mantenedor de socios.
+          No tienes el permiso <strong className="text-rose-300">"partners:manage"</strong> para acceder al mantenedor de socios.
           Comunícate con un administrador o líder de tu organización.
         </p>
       </div>
@@ -221,10 +171,10 @@ export const PartnerManagement: React.FC = () => {
             </span>
           </div>
           <h2 className="text-xl sm:text-2xl font-bold font-luxury text-white">
-            Mantenedor de Socios & Permisos
+            Mantenedor de Socios
           </h2>
           <p className="text-xs text-slate-400">
-            Crea nuevos socios, asigna roles de liderazgo y gestiona los códigos de referido.
+            Crea nuevos socios, asigna roles desde la base de datos y gestiona los códigos de referido.
           </p>
         </div>
 
@@ -258,16 +208,18 @@ export const PartnerManagement: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-3 w-full md:w-auto">
-          {/* Role Filter */}
+          {/* Dynamic Role Filter */}
           <select
             value={selectedRole}
             onChange={(e) => setSelectedRole(e.target.value)}
             className="bg-slate-900 border border-slate-700 text-xs text-white rounded-xl px-3 py-2 focus:outline-none focus:border-allstar-gold"
           >
             <option value="all">Todos los Roles</option>
-            <option value="admin">Administradores</option>
-            <option value="leader">Líderes de Equipo</option>
-            <option value="partner">Socios Generales</option>
+            {availableRoles.map((r) => (
+              <option key={r._id} value={r.slug}>
+                {r.name}
+              </option>
+            ))}
           </select>
 
           {/* Status Filter */}
@@ -291,8 +243,7 @@ export const PartnerManagement: React.FC = () => {
               <tr>
                 <th className="py-3 px-4 font-semibold">Socio / Contacto</th>
                 <th className="py-3 px-4 font-semibold">Código Referido</th>
-                <th className="py-3 px-4 font-semibold">Rol</th>
-                <th className="py-3 px-4 font-semibold">Permisos Asignados</th>
+                <th className="py-3 px-4 font-semibold">Rol Asignado</th>
                 <th className="py-3 px-4 font-semibold text-center">Invitados</th>
                 <th className="py-3 px-4 font-semibold text-center">Estado</th>
                 <th className="py-3 px-4 font-semibold text-right">Acciones</th>
@@ -301,13 +252,13 @@ export const PartnerManagement: React.FC = () => {
             <tbody className="divide-y divide-white/5">
               {isLoading ? (
                 <tr>
-                  <td colSpan={7} className="py-8 text-center text-slate-400">
+                  <td colSpan={6} className="py-8 text-center text-slate-400">
                     Cargando lista de socios...
                   </td>
                 </tr>
               ) : partners.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-8 text-center text-slate-400">
+                  <td colSpan={6} className="py-8 text-center text-slate-400">
                     No se encontraron socios registrados.
                   </td>
                 </tr>
@@ -348,51 +299,12 @@ export const PartnerManagement: React.FC = () => {
                       </div>
                     </td>
 
-                    {/* Role */}
+                    {/* Role Display */}
                     <td className="py-3.5 px-4">
-                      {partner.role === 'admin' ? (
-                        <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
-                          <span>👑 Admin</span>
-                        </span>
-                      ) : partner.role === 'leader' ? (
-                        <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-bold bg-sky-500/20 text-sky-300 border border-sky-500/40">
-                          <span>⭐ Líder</span>
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-500/15 text-purple-300 border border-purple-500/30">
-                          <span>🤝 Socio</span>
-                        </span>
-                      )}
-                    </td>
-
-                    {/* Permissions list */}
-                    <td className="py-3.5 px-4">
-                      <div className="flex flex-wrap gap-1 max-w-xs">
-                        {partner.role === 'admin' ? (
-                          <span className="text-[10px] px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/30">
-                            Todos los permisos (Superusuario)
-                          </span>
-                        ) : partner.permissions && partner.permissions.length > 0 ? (
-                          partner.permissions.map((p) => (
-                            <span
-                              key={p}
-                              className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-slate-300 border border-white/10 font-mono"
-                            >
-                              {p === 'invite_prospects'
-                                ? 'Invitar'
-                                : p === 'manage_partners'
-                                ? 'Crear Socios'
-                                : p === 'create_events'
-                                ? 'Crear Eventos'
-                                : p === 'view_metrics'
-                                ? 'Métricas'
-                                : 'Scanner'}
-                            </span>
-                          ))
-                        ) : (
-                          <span className="text-xs text-slate-500 italic">Sin permisos</span>
-                        )}
-                      </div>
+                      <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-bold bg-white/5 border border-white/10 text-allstar-gold font-mono">
+                        <Shield className="w-3 h-3 text-allstar-gold" />
+                        <span>{partner.roleName || partner.role}</span>
+                      </span>
                     </td>
 
                     {/* Invited stats */}
@@ -423,7 +335,7 @@ export const PartnerManagement: React.FC = () => {
                       <button
                         onClick={() => setEditingPartner({ ...partner })}
                         className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors"
-                        title="Modificar rol y permisos"
+                        title="Modificar rol y estado"
                       >
                         <Edit2 className="w-3.5 h-3.5" />
                       </button>
@@ -443,7 +355,7 @@ export const PartnerManagement: React.FC = () => {
             <div className="px-6 py-4 bg-allstar-navy-900 border-b border-allstar-gold/20 flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <UserPlus className="w-5 h-5 text-allstar-gold" />
-                <h3 className="font-bold text-white text-base">Registrar Nuevo Socio en el Sistema</h3>
+                <h3 className="font-bold text-white text-base">Registrar Nuevo Socio</h3>
               </div>
               <button
                 onClick={() => setShowCreateModal(false)}
@@ -524,47 +436,22 @@ export const PartnerManagement: React.FC = () => {
 
                 <div>
                   <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1 font-semibold">
-                    Rol en la Organización *
+                    Rol Asignado *
                   </label>
                   <select
-                    value={newRole}
-                    onChange={(e) => handleRoleChange(e.target.value as UserRole)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-allstar-gold"
+                    value={newRoleId}
+                    onChange={(e) => setNewRoleId(e.target.value)}
+                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-allstar-gold font-medium"
                   >
-                    <option value="partner">Socio (Invita prospectos)</option>
-                    <option value="leader">Líder (Invita y puede crear socios)</option>
-                    <option value="admin">Administrador (Todos los accesos)</option>
+                    {availableRoles.map((r) => (
+                      <option key={r._id} value={r._id}>
+                        {r.name} ({r.slug})
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
 
-              {/* Granular Permissions Checkboxes */}
-              <div>
-                <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-2 font-semibold">
-                  Permisos Específicos Asignados:
-                </label>
-                <div className="space-y-2 bg-slate-900/60 p-3 rounded-xl border border-white/10">
-                  {AVAILABLE_PERMISSIONS.map((perm) => (
-                    <label
-                      key={perm.id}
-                      className="flex items-start space-x-3 p-2 rounded-lg hover:bg-white/[0.03] cursor-pointer transition-colors"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={newPermissions.includes(perm.id)}
-                        onChange={() => handleTogglePermission(perm.id)}
-                        className="mt-1 rounded text-allstar-gold focus:ring-allstar-gold bg-slate-800 border-slate-700"
-                      />
-                      <div>
-                        <span className="text-xs font-bold text-white block">{perm.label}</span>
-                        <span className="text-[11px] text-slate-400 block">{perm.desc}</span>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Password */}
               <div>
                 <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1 font-semibold">
                   Contraseña Inicial de Acceso
@@ -576,9 +463,6 @@ export const PartnerManagement: React.FC = () => {
                   onChange={(e) => setNewPassword(e.target.value)}
                   className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-white font-mono focus:outline-none focus:border-allstar-gold"
                 />
-                <span className="text-[11px] text-slate-400 mt-1 block">
-                  El nuevo socio podrá iniciar sesión con su correo y esta contraseña.
-                </span>
               </div>
 
               <div className="pt-4 flex justify-end space-x-3 border-t border-white/10">
@@ -602,14 +486,14 @@ export const PartnerManagement: React.FC = () => {
         </div>
       )}
 
-      {/* Modal: Editar Socio y Permisos */}
+      {/* Modal: Editar Rol del Socio */}
       {editingPartner && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200">
           <div className="w-full max-w-lg bg-allstar-navy-800 rounded-3xl border border-allstar-gold/40 shadow-2xl overflow-hidden my-8">
             <div className="px-6 py-4 bg-allstar-navy-900 border-b border-allstar-gold/20 flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <Shield className="w-5 h-5 text-allstar-gold" />
-                <h3 className="font-bold text-white text-base">Modificar Socio & Permisos</h3>
+                <h3 className="font-bold text-white text-base">Modificar Socio & Rol</h3>
               </div>
               <button
                 onClick={() => setEditingPartner(null)}
@@ -634,52 +518,27 @@ export const PartnerManagement: React.FC = () => {
 
               <div>
                 <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1 font-semibold">
-                  Rol
+                  Rol Asignado
                 </label>
                 <select
-                  value={editingPartner.role}
-                  onChange={(e) => setEditingPartner({ ...editingPartner, role: e.target.value as UserRole })}
+                  value={editingPartner.roleId || ''}
+                  onChange={(e) => {
+                    const selId = e.target.value;
+                    const rDoc = availableRoles.find((r) => r._id === selId);
+                    setEditingPartner({
+                      ...editingPartner,
+                      roleId: selId,
+                      role: rDoc?.slug || editingPartner.role,
+                    });
+                  }}
                   className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-allstar-gold"
                 >
-                  <option value="partner">Socio (Invita prospectos)</option>
-                  <option value="leader">Líder (Invita y puede crear socios)</option>
-                  <option value="admin">Administrador (Control total)</option>
+                  {availableRoles.map((r) => (
+                    <option key={r._id} value={r._id}>
+                      {r.name} ({r.slug})
+                    </option>
+                  ))}
                 </select>
-              </div>
-
-              {/* Permissions */}
-              <div>
-                <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-2 font-semibold">
-                  Permisos Habilitados:
-                </label>
-                <div className="space-y-2 bg-slate-900/60 p-3 rounded-xl border border-white/10">
-                  {AVAILABLE_PERMISSIONS.map((perm) => {
-                    const isChecked = editingPartner.permissions?.includes(perm.id);
-                    return (
-                      <label
-                        key={perm.id}
-                        className="flex items-start space-x-3 p-1.5 rounded-lg hover:bg-white/[0.03] cursor-pointer"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={isChecked}
-                          onChange={() => {
-                            const perms = editingPartner.permissions || [];
-                            const updated = isChecked
-                              ? perms.filter((p) => p !== perm.id)
-                              : [...perms, perm.id];
-                            setEditingPartner({ ...editingPartner, permissions: updated });
-                          }}
-                          className="mt-1 rounded text-allstar-gold focus:ring-allstar-gold bg-slate-800 border-slate-700"
-                        />
-                        <div>
-                          <span className="text-xs font-bold text-white block">{perm.label}</span>
-                          <span className="text-[11px] text-slate-400 block">{perm.desc}</span>
-                        </div>
-                      </label>
-                    );
-                  })}
-                </div>
               </div>
 
               {/* Active / Inactive switch */}

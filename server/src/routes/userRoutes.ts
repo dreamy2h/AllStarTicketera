@@ -12,9 +12,9 @@ const router = Router();
 // Public referral check for registration landing
 router.get('/referral/:code', checkReferralCode);
 
-// Protected routes
+// Protected routes with granular permissions
 router.get('/', protect, getPartners);
-router.post('/', protect, requirePermission('manage_partners'), createPartner);
-router.put('/:id', protect, requirePermission('manage_partners'), updatePartner);
+router.post('/', protect, requirePermission('partners:manage'), createPartner);
+router.put('/:id', protect, requirePermission('partners:manage'), updatePartner);
 
 export default router;

@@ -1,10 +1,31 @@
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { User, IUser } from '../models/User.js';
+import { User } from '../models/User.js';
+import { IRole } from '../models/Role.js';
 import { JWT_SECRET, AuthenticatedRequest } from '../middleware/authMiddleware.js';
 
 const generateToken = (userId: string): string => {
   return jwt.sign({ id: userId }, JWT_SECRET, { expiresIn: '7d' });
+};
+
+const extractPermissionCodes = (user: any): string[] => {
+  const codes = new Set<string>();
+  if (user.roleId && typeof user.roleId === 'object') {
+    const role = user.roleId as IRole;
+    if (Array.isArray(role.permissions)) {
+      role.permissions.forEach((perm: any) => {
+        if (perm && perm.code) codes.add(perm.code.toLowerCase());
+      });
+    }
+  }
+  if (Array.isArray(user.customPermissions)) {
+    user.customPermissions.forEach((perm: any) => {
+      if (perm && perm.code) codes.add(perm.code.toLowerCase());
+    });
+  }
+  // Admin fallback
+  if (user.role === 'admin') codes.add('*');
+  return Array.from(codes);
 };
 
 export const login = async (req: Request, res: Response): Promise<void> => {
@@ -19,7 +40,13 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const user = await User.findOne({ email: email.toLowerCase().trim() }).select('+password');
+    const user = await User.findOne({ email: email.toLowerCase().trim() })
+      .select('+password')
+      .populate({
+        path: 'roleId',
+        populate: { path: 'permissions' },
+      })
+      .populate('customPermissions');
 
     if (!user) {
       res.status(401).json({
@@ -47,6 +74,8 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     }
 
     const token = generateToken(user._id.toString());
+    const permissions = extractPermissionCodes(user);
+    const roleObj = user.roleId as IRole | undefined;
 
     res.json({
       success: true,
@@ -57,7 +86,9 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         fullName: user.fullName,
         email: user.email,
         role: user.role,
-        permissions: user.permissions,
+        roleName: roleObj ? roleObj.name : user.role,
+        roleId: roleObj?._id,
+        permissions,
         referralCode: user.referralCode,
         phone: user.phone,
         isActive: user.isActive,
@@ -77,6 +108,9 @@ export const getMe = async (req: AuthenticatedRequest, res: Response): Promise<v
     }
 
     const user = req.user;
+    const permissions = req.userPermissions || extractPermissionCodes(user);
+    const roleObj = user.roleId as IRole | undefined;
+
     res.json({
       success: true,
       user: {
@@ -84,7 +118,9 @@ export const getMe = async (req: AuthenticatedRequest, res: Response): Promise<v
         fullName: user.fullName,
         email: user.email,
         role: user.role,
-        permissions: user.permissions,
+        roleName: roleObj ? roleObj.name : user.role,
+        roleId: roleObj?._id,
+        permissions,
         referralCode: user.referralCode,
         phone: user.phone,
         isActive: user.isActive,

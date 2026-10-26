@@ -1,21 +1,15 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Document, Schema, Types } from 'mongoose';
 import bcrypt from 'bcryptjs';
-
-export type UserRole = 'admin' | 'leader' | 'partner';
-
-export type Permission =
-  | 'invite_prospects'
-  | 'manage_partners'
-  | 'create_events'
-  | 'view_metrics'
-  | 'door_scanner';
+import { IRole } from './Role.js';
+import { IPermission } from './Permission.js';
 
 export interface IUser extends Document {
   fullName: string;
   email: string;
   password?: string;
-  role: UserRole;
-  permissions: Permission[];
+  roleId?: Types.ObjectId | IRole;
+  role: string; // Slug representation: 'admin' | 'leader' | 'partner' or custom
+  customPermissions?: Types.ObjectId[] | IPermission[];
   referralCode: string;
   phone?: string;
   isActive: boolean;
@@ -44,15 +38,23 @@ const UserSchema = new Schema<IUser>(
       minlength: 6,
       select: false,
     },
+    roleId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Role',
+      index: true,
+    },
     role: {
       type: String,
-      enum: ['admin', 'leader', 'partner'],
       default: 'partner',
+      trim: true,
+      index: true,
     },
-    permissions: {
-      type: [String],
-      default: ['invite_prospects'],
-    },
+    customPermissions: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Permission',
+      },
+    ],
     referralCode: {
       type: String,
       required: [true, 'El código de referido es obligatorio'],

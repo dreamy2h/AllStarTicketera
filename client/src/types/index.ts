@@ -1,19 +1,30 @@
-export type UserRole = 'admin' | 'leader' | 'partner';
+export interface PermissionItem {
+  _id: string;
+  code: string;
+  name: string;
+  category: string;
+  description?: string;
+}
 
-export type Permission =
-  | 'invite_prospects'
-  | 'manage_partners'
-  | 'create_events'
-  | 'view_metrics'
-  | 'door_scanner';
+export interface RoleItem {
+  _id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  permissions: (PermissionItem | string)[];
+  isSystem?: boolean;
+  userCount?: number;
+}
 
 export interface User {
   _id: string;
   id?: string;
   fullName: string;
   email: string;
-  role: UserRole;
-  permissions: Permission[];
+  role: string;
+  roleName?: string;
+  roleId?: string;
+  permissions: string[];
   referralCode: string;
   phone?: string;
   isActive: boolean;
@@ -107,16 +118,16 @@ export interface CreatePartnerPayload {
   email: string;
   referralCode: string;
   phone?: string;
-  role: UserRole;
-  permissions: Permission[];
+  role?: string;
+  roleId?: string;
   password?: string;
 }
 
 export interface UpdatePartnerPayload {
   fullName?: string;
   phone?: string;
-  role?: UserRole;
-  permissions?: Permission[];
+  role?: string;
+  roleId?: string;
   isActive?: boolean;
   password?: string;
 }
@@ -131,4 +142,17 @@ export interface CreateEventPayload {
   guestLeaders: string[];
   capacityLimit?: number | null;
   ticketTypes?: { name: string; price: number; maxQuantity?: number }[];
+}
+
+export interface CreateRolePayload {
+  name: string;
+  slug: string;
+  description?: string;
+  permissions: string[];
+}
+
+export interface UpdateRolePayload {
+  name?: string;
+  description?: string;
+  permissions?: string[];
 }

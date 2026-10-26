@@ -15,10 +15,10 @@ const router = Router();
 router.get('/', getAllEvents);
 router.get('/:slug', getEventBySlug);
 
-// Protected routes
-router.post('/', protect, requirePermission('create_events'), createEvent);
+// Protected routes with dynamic permissions
+router.post('/', protect, requirePermission('events:create'), createEvent);
 router.get('/:id/stats', protect, getEventStats);
-router.get('/:id/export', protect, requirePermission('view_metrics'), exportEventAttendeesCsv);
+router.get('/:id/export', protect, requirePermission('metrics:export'), exportEventAttendeesCsv);
 router.get('/:eventId/attendees', protect, getEventAttendees);
 
 export default router;

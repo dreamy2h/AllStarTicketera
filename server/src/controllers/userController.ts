@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
-import { User, Permission, UserRole } from '../models/User.js';
+import { User } from '../models/User.js';
+import { Role } from '../models/Role.js';
 import { Ticket } from '../models/Ticket.js';
 
 export const getPartners = async (req: Request, res: Response): Promise<void> => {
@@ -26,7 +27,12 @@ export const getPartners = async (req: Request, res: Response): Promise<void> =>
       ];
     }
 
-    const partners = await User.find(query).sort({ createdAt: -1 });
+    const partners = await User.find(query)
+      .populate({
+        path: 'roleId',
+        populate: { path: 'permissions' },
+      })
+      .sort({ createdAt: -1 });
 
     // Aggregate stats per partner (total invited and checked in)
     const partnersWithStats = await Promise.all(
@@ -41,13 +47,17 @@ export const getPartners = async (req: Request, res: Response): Promise<void> =>
           status: 'checked_in',
         });
 
+        const roleObj = partner.roleId as any;
+
         return {
           id: partner._id,
           _id: partner._id,
           fullName: partner.fullName,
           email: partner.email,
           role: partner.role,
-          permissions: partner.permissions,
+          roleId: roleObj?._id,
+          roleName: roleObj?.name || partner.role,
+          permissions: roleObj?.permissions || [],
           referralCode: partner.referralCode,
           phone: partner.phone,
           isActive: partner.isActive,
@@ -69,7 +79,7 @@ export const getPartners = async (req: Request, res: Response): Promise<void> =>
 
 export const createPartner = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { fullName, email, referralCode, phone, role, permissions, password } = req.body;
+    const { fullName, email, referralCode, phone, role, roleId, password } = req.body;
 
     if (!fullName || !email || !referralCode) {
       res.status(400).json({
@@ -91,34 +101,22 @@ export const createPartner = async (req: Request, res: Response): Promise<void> 
       return;
     }
 
-    const partnerRole: UserRole = role || 'partner';
+    // Resolve Role model
+    let targetRoleId = roleId;
+    let targetRoleSlug = role || 'partner';
 
-    // Assign standard default permissions based on role if none provided
-    let partnerPermissions: Permission[] = [];
-    if (Array.isArray(permissions) && permissions.length > 0) {
-      partnerPermissions = permissions;
+    if (roleId) {
+      const foundRole = await Role.findById(roleId);
+      if (foundRole) {
+        targetRoleSlug = foundRole.slug;
+      }
     } else {
-      if (partnerRole === 'admin') {
-        partnerPermissions = [
-          'invite_prospects',
-          'manage_partners',
-          'create_events',
-          'view_metrics',
-          'door_scanner',
-        ];
-      } else if (partnerRole === 'leader') {
-        partnerPermissions = [
-          'invite_prospects',
-          'manage_partners',
-          'view_metrics',
-          'door_scanner',
-        ];
-      } else {
-        partnerPermissions = ['invite_prospects'];
+      const foundRole = await Role.findOne({ slug: targetRoleSlug });
+      if (foundRole) {
+        targetRoleId = foundRole._id;
       }
     }
 
-    // Default password if not provided
     const userPassword = password && password.trim().length >= 6 ? password.trim() : 'AllStar2026!';
 
     const partner = new User({
@@ -126,27 +124,23 @@ export const createPartner = async (req: Request, res: Response): Promise<void> 
       email: email.toLowerCase().trim(),
       referralCode: referralCode.toLowerCase().trim(),
       phone: phone ? phone.trim() : '',
-      role: partnerRole,
-      permissions: partnerPermissions,
+      role: targetRoleSlug,
+      roleId: targetRoleId,
       password: userPassword,
       isActive: true,
     });
 
     await partner.save();
 
+    const populated = await User.findById(partner._id).populate({
+      path: 'roleId',
+      populate: { path: 'permissions' },
+    });
+
     res.status(201).json({
       success: true,
       message: `Socio "${partner.fullName}" creado exitosamente. Contraseña asignada: ${userPassword}`,
-      partner: {
-        id: partner._id,
-        fullName: partner.fullName,
-        email: partner.email,
-        role: partner.role,
-        permissions: partner.permissions,
-        referralCode: partner.referralCode,
-        phone: partner.phone,
-        isActive: partner.isActive,
-      },
+      partner: populated,
     });
   } catch (error: any) {
     console.error('Error al crear socio:', error);
@@ -157,7 +151,7 @@ export const createPartner = async (req: Request, res: Response): Promise<void> 
 export const updatePartner = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const { fullName, phone, role, permissions, isActive, password } = req.body;
+    const { fullName, phone, role, roleId, isActive, password } = req.body;
 
     const partner = await User.findById(id);
     if (!partner) {
@@ -167,8 +161,17 @@ export const updatePartner = async (req: Request, res: Response): Promise<void> 
 
     if (fullName) partner.fullName = fullName.trim();
     if (phone !== undefined) partner.phone = phone.trim();
-    if (role) partner.role = role;
-    if (Array.isArray(permissions)) partner.permissions = permissions;
+
+    if (roleId) {
+      partner.roleId = roleId;
+      const foundRole = await Role.findById(roleId);
+      if (foundRole) partner.role = foundRole.slug;
+    } else if (role) {
+      partner.role = role;
+      const foundRole = await Role.findOne({ slug: role });
+      if (foundRole) partner.roleId = foundRole._id;
+    }
+
     if (typeof isActive === 'boolean') partner.isActive = isActive;
     if (password && password.trim().length >= 6) {
       partner.password = password.trim();
@@ -176,19 +179,15 @@ export const updatePartner = async (req: Request, res: Response): Promise<void> 
 
     await partner.save();
 
+    const populated = await User.findById(partner._id).populate({
+      path: 'roleId',
+      populate: { path: 'permissions' },
+    });
+
     res.json({
       success: true,
       message: 'Información del socio actualizada correctamente.',
-      partner: {
-        id: partner._id,
-        fullName: partner.fullName,
-        email: partner.email,
-        role: partner.role,
-        permissions: partner.permissions,
-        referralCode: partner.referralCode,
-        phone: partner.phone,
-        isActive: partner.isActive,
-      },
+      partner: populated,
     });
   } catch (error: any) {
     console.error('Error al actualizar socio:', error);

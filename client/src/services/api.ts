@@ -9,6 +9,10 @@ import {
   CreatePartnerPayload,
   UpdatePartnerPayload,
   CreateEventPayload,
+  RoleItem,
+  PermissionItem,
+  CreateRolePayload,
+  UpdateRolePayload,
 } from '../types/index.js';
 
 const API_BASE = '/api';
@@ -181,5 +185,54 @@ export const api = {
     const res = await fetch(`${API_BASE}/users/referral/${code}`);
     if (!res.ok) throw new Error('Código no válido');
     return res.json();
+  },
+
+  // Roles & Permisos Dinámicos
+  async getRoles(): Promise<RoleItem[]> {
+    const res = await fetch(`${API_BASE}/roles`, {
+      headers: getAuthHeaders(),
+    });
+    const data = await res.json();
+    return data.roles || [];
+  },
+
+  async getPermissions(): Promise<{ permissions: PermissionItem[]; grouped: Record<string, PermissionItem[]> }> {
+    const res = await fetch(`${API_BASE}/roles/permissions`, {
+      headers: getAuthHeaders(),
+    });
+    const data = await res.json();
+    return data;
+  },
+
+  async createRole(payload: CreateRolePayload): Promise<{ role: RoleItem; message: string }> {
+    const res = await fetch(`${API_BASE}/roles`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Error al crear rol');
+    return data;
+  },
+
+  async updateRole(id: string, payload: UpdateRolePayload): Promise<{ role: RoleItem; message: string }> {
+    const res = await fetch(`${API_BASE}/roles/${id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Error al actualizar rol');
+    return data;
+  },
+
+  async deleteRole(id: string): Promise<{ message: string }> {
+    const res = await fetch(`${API_BASE}/roles/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Error al eliminar rol');
+    return data;
   },
 };
