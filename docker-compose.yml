@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  # Base de Datos MongoDB
+  mongo:
+    image: mongo:7.0
+    container_name: allstar-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=allstar_tickets
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - allstar-network
+
+  # Backend API (Node.js + Express + TypeScript)
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: allstar-server
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+      - MONGODB_URI=mongodb://mongo:27017/allstar_tickets
+      - CLIENT_URL=http://localhost:3000
+      - JWT_SECRET=${JWT_SECRET:-allstar_super_secret_jwt_key_2026}
+      - RESEND_API_KEY=${RESEND_API_KEY:-}
+      - RESEND_FROM_EMAIL=${RESEND_FROM_EMAIL:-AllStar Tickets <onboarding@resend.dev>}
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - allstar-network
+
+  # Frontend Web (React + Vite + Tailwind + Nginx)
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: allstar-client
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - server
+    networks:
+      - allstar-network
+
+networks:
+  allstar-network:
+    driver: bridge
+
+volumes:
+  mongo_data:
+    driver: local

@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #060b17;
+    color: #e2e8f0;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  h1, h2, h3, .font-heading {
+    letter-spacing: -0.02em;
+  }
+
+  .font-luxury {
+    font-family: 'Cinzel', serif;
+  }
+}
+
+/* Custom Boarding Pass perforation line */
+.perforated-edge {
+  background-image: radial-gradient(circle at 10px 0, transparent 0, transparent 10px, #0f172a 11px);
+}
+
+.ticket-notch-left {
+  position: absolute;
+  left: -12px;
+  width: 24px;
+  height: 24px;
+  background-color: #060b17;
+  border-radius: 9999px;
+  box-shadow: inset -2px 0 3px rgba(0, 0, 0, 0.4);
+}
+
+.ticket-notch-right {
+  position: absolute;
+  right: -12px;
+  width: 24px;
+  height: 24px;
+  background-color: #060b17;
+  border-radius: 9999px;
+  box-shadow: inset 2px 0 3px rgba(0, 0, 0, 0.4);
+}
+
+/* Metallic gold gradients */
+.gold-gradient-text {
+  background: linear-gradient(135deg, #f7e7a9 0%, #d4af37 50%, #aa820a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gold-gradient-bg {
+  background: linear-gradient(135deg, #f7e7a9 0%, #d4af37 50%, #aa820a 100%);
+}
+
+.card-luxury {
+  background: linear-gradient(160deg, #111a33 0%, #0c1326 100%);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5), 0 0 15px rgba(212, 175, 55, 0.08);
+}
+
+/* Scanner target box animation */
+@keyframes scanline {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(220px); }
+  100% { transform: translateY(0); }
+}
+
+.scanner-laser {
+  animation: scanline 2.2s ease-in-out infinite;
+}
