@@ -68,7 +68,9 @@ export const AdminPage: React.FC = () => {
         setEvents(eventsData);
 
         if (eventsData.length > 0) {
-          setSelectedEventId(eventsData[0]._id);
+          const initialId = selectedEventId || eventsData[0]._id;
+          setSelectedEventId(initialId);
+          fetchEventData(initialId, eventsData);
         }
 
         if (currentUser) {
@@ -89,21 +91,29 @@ export const AdminPage: React.FC = () => {
     init();
   }, [currentUser]);
 
-  // Fetch event specific data whenever selected event changes
+  // Fetch event specific data whenever selected event changes or user logs in
   useEffect(() => {
     if (!selectedEventId) return;
     fetchEventData(selectedEventId);
-  }, [selectedEventId]);
+  }, [selectedEventId, currentUser]);
 
-  const fetchEventData = async (eventId: string) => {
+  const fetchEventData = async (eventId: string, currentEventsList?: EventItem[]) => {
     try {
       setIsRefreshing(true);
-      const currentEvent = events.find((e) => e._id === eventId);
+      const eventsList = (currentEventsList && currentEventsList.length > 0) ? currentEventsList : events;
+      const currentEvent = eventsList.find((e) => e._id === eventId);
+      const hasAuth = !!(currentUser || localStorage.getItem('allstar_token'));
 
-      if (currentUser) {
+      if (hasAuth) {
         const [statsRes, attendeesRes, eventDetails] = await Promise.all([
-          api.getEventStats(eventId).catch(() => null),
-          api.getEventAttendees(eventId).catch(() => ({ attendees: [], count: 0 })),
+          api.getEventStats(eventId).catch((e) => {
+            console.error('Error stats:', e);
+            return null;
+          }),
+          api.getEventAttendees(eventId).catch((e) => {
+            console.error('Error attendees:', e);
+            return { attendees: [], count: 0 };
+          }),
           currentEvent ? api.getEventBySlug(currentEvent.slug).catch(() => null) : Promise.resolve(null),
         ]);
 
@@ -112,8 +122,8 @@ export const AdminPage: React.FC = () => {
         if (eventDetails) setTicketTypes(eventDetails.ticketTypes);
       } else {
         if (currentEvent) {
-          const eventDetails = await api.getEventBySlug(currentEvent.slug);
-          setTicketTypes(eventDetails.ticketTypes);
+          const eventDetails = await api.getEventBySlug(currentEvent.slug).catch(() => null);
+          if (eventDetails) setTicketTypes(eventDetails.ticketTypes);
         }
       }
     } catch (err: any) {

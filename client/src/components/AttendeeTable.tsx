@@ -3,6 +3,7 @@ import {
   Search,
   Filter,
   Download,
+  Loader2,
   CheckCircle,
   Clock,
   ExternalLink,
@@ -33,6 +34,7 @@ export const AttendeeTable: React.FC<AttendeeTableProps> = ({
   const [selectedPartnerId, setSelectedPartnerId] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [checkingInCode, setCheckingInCode] = useState<string | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
 
   // Client-side quick filter
   const filteredAttendees = attendees.filter((t) => {
@@ -70,9 +72,15 @@ export const AttendeeTable: React.FC<AttendeeTableProps> = ({
     }
   };
 
-  const handleDownloadCsv = () => {
-    const url = api.getExportCsvUrl(eventId);
-    window.open(url, '_blank');
+  const handleDownloadCsv = async () => {
+    try {
+      setIsExporting(true);
+      await api.downloadExportCsv(eventId);
+    } catch (err: any) {
+      alert(err.message || 'Error al exportar archivo');
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   return (
@@ -122,11 +130,16 @@ export const AttendeeTable: React.FC<AttendeeTableProps> = ({
           {/* CSV Export Button */}
           <button
             onClick={handleDownloadCsv}
-            className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-600 dark:text-white font-semibold text-xs active:scale-95 transition-all shadow-sm ml-auto"
+            disabled={isExporting}
+            className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-600 dark:text-white font-semibold text-xs active:scale-95 transition-all shadow-sm ml-auto disabled:opacity-50 disabled:cursor-not-allowed"
             title="Descargar lista completa compatible con Excel"
           >
-            <Download className="w-4 h-4 text-amber-600 dark:text-allstar-gold" />
-            <span>Exportar CSV / Excel</span>
+            {isExporting ? (
+              <Loader2 className="w-4 h-4 animate-spin text-amber-600 dark:text-allstar-gold" />
+            ) : (
+              <Download className="w-4 h-4 text-amber-600 dark:text-allstar-gold" />
+            )}
+            <span>{isExporting ? 'Exportando...' : 'Exportar CSV / Excel'}</span>
           </button>
         </div>
       </div>

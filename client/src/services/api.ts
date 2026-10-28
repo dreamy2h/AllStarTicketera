@@ -115,7 +115,43 @@ export const api = {
   },
 
   getExportCsvUrl(eventId: string): string {
-    return `${API_BASE}/events/${eventId}/export`;
+    const token = localStorage.getItem('allstar_token');
+    return `${API_BASE}/events/${eventId}/export${token ? `?token=${encodeURIComponent(token)}` : ''}`;
+  },
+
+  async downloadExportCsv(eventId: string, eventTitle?: string): Promise<void> {
+    const res = await fetch(`${API_BASE}/events/${eventId}/export`, {
+      headers: getAuthHeaders(),
+    });
+
+    if (!res.ok) {
+      let errMsg = 'Error al exportar archivo CSV';
+      try {
+        const data = await res.json();
+        if (data.message) errMsg = data.message;
+      } catch (_) {}
+      throw new Error(errMsg);
+    }
+
+    const blob = await res.blob();
+    const disposition = res.headers.get('Content-Disposition');
+    let filename = `asistentes_${eventTitle ? eventTitle.toLowerCase().replace(/[^a-z0-9]/g, '_') : 'evento'}_${new Date().toISOString().split('T')[0]}.csv`;
+
+    if (disposition && disposition.includes('filename=')) {
+      const match = disposition.match(/filename="?([^";]+)"?/);
+      if (match && match[1]) {
+        filename = match[1];
+      }
+    }
+
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
   },
 
   // Tickets
