@@ -109,17 +109,17 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({ onClose, onS
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200">
-      <div className="w-full max-w-2xl bg-allstar-navy-800 rounded-3xl border border-allstar-gold/40 shadow-2xl overflow-hidden my-8">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-black/80 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200">
+      <div className="w-full max-w-2xl bg-white dark:bg-allstar-navy-800 rounded-3xl border border-amber-500/30 dark:border-allstar-gold/40 shadow-2xl overflow-hidden my-8">
         {/* Header */}
-        <div className="px-6 py-4 bg-allstar-navy-900 border-b border-allstar-gold/20 flex items-center justify-between">
+        <div className="px-6 py-4 bg-slate-50 dark:bg-allstar-navy-900 border-b border-slate-200 dark:border-allstar-gold/20 flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Compass className="w-5 h-5 text-allstar-gold" />
-            <h3 className="font-bold text-white text-base">Crear Nueva Cumbre / Evento</h3>
+            <Compass className="w-5 h-5 text-amber-600 dark:text-allstar-gold" />
+            <h3 className="font-bold text-slate-900 dark:text-white text-base">Crear Nueva Cumbre / Evento</h3>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+            className="p-1.5 rounded-full bg-slate-200 hover:bg-slate-300 dark:bg-white/10 dark:hover:bg-white/20 text-slate-700 dark:text-white transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -127,7 +127,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({ onClose, onS
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
           {error && (
-            <div className="p-3.5 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs flex items-center space-x-2">
+            <div className="p-3.5 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-700 dark:text-rose-300 text-xs flex items-center space-x-2">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{error}</span>
             </div>
@@ -135,7 +135,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({ onClose, onS
 
           {/* Title & Slug */}
           <div>
-            <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1 font-semibold">
+            <label className="block text-xs font-mono uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1 font-semibold">
               Título del Evento *
             </label>
             <input
@@ -144,16 +144,16 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({ onClose, onS
               value={title}
               onChange={(e) => handleTitleChange(e.target.value)}
               placeholder="Ej: Cumbre de Liderazgo & Cruceros Medellín 2026"
-              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-allstar-gold"
+              className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-amber-500 dark:focus:border-allstar-gold"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1 font-semibold">
+            <label className="block text-xs font-mono uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1 font-semibold">
               URL Amigable (Slug) *
             </label>
             <div className="relative">
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs font-mono">
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 text-xs font-mono">
                 /eventos/
               </span>
               <input
@@ -162,7 +162,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({ onClose, onS
                 value={slug}
                 onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
                 placeholder="cumbre-medellin-2026"
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl pl-24 pr-3.5 py-2.5 text-sm text-white font-mono focus:outline-none focus:border-allstar-gold"
+                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl pl-24 pr-3.5 py-2.5 text-sm text-slate-900 dark:text-white font-mono placeholder:text-slate-400 focus:outline-none focus:border-amber-500 dark:focus:border-allstar-gold"
               />
             </div>
           </div>
@@ -170,7 +170,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({ onClose, onS
           {/* Date & Time */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1 font-semibold">
+              <label className="block text-xs font-mono uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1 font-semibold">
                 Fecha del Evento *
               </label>
               <input
@@ -178,12 +178,12 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({ onClose, onS
                 required
                 value={eventDate}
                 onChange={(e) => setEventDate(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-allstar-gold"
+                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 dark:focus:border-allstar-gold"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1 font-semibold">
+              <label className="block text-xs font-mono uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1 font-semibold">
                 Hora de Inicio (24h) *
               </label>
               <input
@@ -191,7 +191,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({ onClose, onS
                 required
                 value={eventTime}
                 onChange={(e) => setEventTime(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-allstar-gold"
+                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 dark:focus:border-allstar-gold"
               />
             </div>
           </div>
@@ -199,7 +199,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({ onClose, onS
           {/* City & Venue */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1 font-semibold">
+              <label className="block text-xs font-mono uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1 font-semibold">
                 Ciudad / Destino *
               </label>
               <input
@@ -208,12 +208,12 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({ onClose, onS
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
                 placeholder="Ej: Medellín / El Poblado"
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-allstar-gold"
+                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-amber-500 dark:focus:border-allstar-gold"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1 font-semibold">
+              <label className="block text-xs font-mono uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1 font-semibold">
                 Recinto / Hotel *
               </label>
               <input
@@ -222,13 +222,13 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({ onClose, onS
                 value={venueName}
                 onChange={(e) => setVenueName(e.target.value)}
                 placeholder="Hotel InterContinental Gran Salón"
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-allstar-gold"
+                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-amber-500 dark:focus:border-allstar-gold"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1 font-semibold">
+            <label className="block text-xs font-mono uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1 font-semibold">
               Dirección Completa del Recinto *
             </label>
             <input
@@ -237,14 +237,14 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({ onClose, onS
               value={venueAddress}
               onChange={(e) => setVenueAddress(e.target.value)}
               placeholder="Calle 16 # 28-51, Variante Las Palmas"
-              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-allstar-gold"
+              className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-amber-500 dark:focus:border-allstar-gold"
             />
           </div>
 
           {/* Guest Leaders & Capacity */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="sm:col-span-2">
-              <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1 font-semibold">
+              <label className="block text-xs font-mono uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1 font-semibold">
                 Líderes Expositores (Separados por coma)
               </label>
               <input
@@ -252,12 +252,12 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({ onClose, onS
                 value={guestLeadersInput}
                 onChange={(e) => setGuestLeadersInput(e.target.value)}
                 placeholder="Zamyr Pedreros, Camila Ríos, Roberto Silva"
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-allstar-gold"
+                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-amber-500 dark:focus:border-allstar-gold"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1 font-semibold">
+              <label className="block text-xs font-mono uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1 font-semibold">
                 Aforo Máx. (Cupos)
               </label>
               <input
@@ -266,7 +266,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({ onClose, onS
                 value={capacityLimit}
                 onChange={(e) => setCapacityLimit(e.target.value)}
                 placeholder="300"
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-allstar-gold"
+                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-amber-500 dark:focus:border-allstar-gold"
               />
             </div>
           </div>
@@ -274,20 +274,20 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({ onClose, onS
           {/* Ticket Types Config */}
           <div className="pt-2">
             <div className="flex items-center justify-between mb-2">
-              <label className="text-xs font-mono uppercase tracking-wider text-slate-300 font-semibold">
+              <label className="text-xs font-mono uppercase tracking-wider text-slate-700 dark:text-slate-300 font-semibold">
                 Tipos de Entrada Disponibles
               </label>
               <button
                 type="button"
                 onClick={handleAddTicketType}
-                className="text-xs text-allstar-gold hover:underline flex items-center space-x-1"
+                className="text-xs text-amber-600 hover:text-amber-700 dark:text-allstar-gold dark:hover:underline flex items-center space-x-1 font-semibold"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Agregar Tipo</span>
               </button>
             </div>
 
-            <div className="space-y-2 bg-slate-900/60 p-3 rounded-xl border border-white/10">
+            <div className="space-y-2 bg-slate-100/70 dark:bg-slate-900/60 p-3 rounded-xl border border-slate-200 dark:border-white/10">
               {ticketTypes.map((t, idx) => (
                 <div key={idx} className="flex items-center gap-2">
                   <input
@@ -296,24 +296,24 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({ onClose, onS
                     value={t.name}
                     onChange={(e) => handleTicketTypeChange(idx, 'name', e.target.value)}
                     placeholder="Nombre de entrada"
-                    className="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-allstar-gold"
+                    className="flex-1 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-amber-500 dark:focus:border-allstar-gold"
                   />
                   <div className="relative w-24">
-                    <span className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs">$</span>
+                    <span className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 text-xs font-mono">$</span>
                     <input
                       type="number"
                       min="0"
                       value={t.price}
                       onChange={(e) => handleTicketTypeChange(idx, 'price', e.target.value)}
                       placeholder="Precio"
-                      className="w-full bg-slate-900 border border-slate-700 rounded-lg pl-5 pr-2 py-1.5 text-xs text-white focus:outline-none focus:border-allstar-gold font-mono"
+                      className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg pl-5 pr-2 py-1.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 dark:focus:border-allstar-gold font-mono"
                     />
                   </div>
                   {ticketTypes.length > 1 && (
                     <button
                       type="button"
                       onClick={() => handleRemoveTicketType(idx)}
-                      className="p-1.5 text-rose-400 hover:text-rose-300 transition-colors"
+                      className="p-1.5 text-rose-500 hover:text-rose-600 dark:text-rose-400 dark:hover:text-rose-300 transition-colors"
                       title="Eliminar tipo"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -325,11 +325,11 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({ onClose, onS
           </div>
 
           {/* Submit */}
-          <div className="pt-4 flex justify-end space-x-3 border-t border-white/10">
+          <div className="pt-4 flex justify-end space-x-3 border-t border-slate-200 dark:border-white/10">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs"
+              className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 font-semibold text-xs transition-colors"
             >
               Cancelar
             </button>

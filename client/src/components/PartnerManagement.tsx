@@ -350,16 +350,16 @@ export const PartnerManagement: React.FC = () => {
 
       {/* Modal: Registrar Nuevo Socio */}
       {showCreateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200">
-          <div className="w-full max-w-xl bg-allstar-navy-800 rounded-3xl border border-allstar-gold/40 shadow-2xl overflow-hidden my-8">
-            <div className="px-6 py-4 bg-allstar-navy-900 border-b border-allstar-gold/20 flex items-center justify-between">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-black/80 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200">
+          <div className="w-full max-w-xl bg-white dark:bg-allstar-navy-800 rounded-3xl border border-amber-500/30 dark:border-allstar-gold/40 shadow-2xl overflow-hidden my-8">
+            <div className="px-6 py-4 bg-slate-50 dark:bg-allstar-navy-900 border-b border-slate-200 dark:border-allstar-gold/20 flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <UserPlus className="w-5 h-5 text-allstar-gold" />
-                <h3 className="font-bold text-white text-base">Registrar Nuevo Socio</h3>
+                <UserPlus className="w-5 h-5 text-amber-600 dark:text-allstar-gold" />
+                <h3 className="font-bold text-slate-900 dark:text-white text-base">Registrar Nuevo Socio</h3>
               </div>
               <button
                 onClick={() => setShowCreateModal(false)}
-                className="p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+                className="p-1.5 rounded-full bg-slate-200 dark:bg-white/10 hover:bg-slate-300 dark:hover:bg-white/20 text-slate-700 dark:text-white transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -367,14 +367,14 @@ export const PartnerManagement: React.FC = () => {
 
             <form onSubmit={handleCreatePartner} className="p-6 space-y-4">
               {modalError && (
-                <div className="p-3 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs flex items-center space-x-2">
-                  <AlertCircle className="w-4 h-4 shrink-0" />
+                <div className="p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-800 dark:text-rose-300 text-xs flex items-center space-x-2">
+                  <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
                   <span>{modalError}</span>
                 </div>
               )}
 
               <div>
-                <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1 font-semibold">
+                <label className="block text-xs font-mono uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1 font-semibold">
                   Nombre Completo del Socio *
                 </label>
                 <input
@@ -383,13 +383,13 @@ export const PartnerManagement: React.FC = () => {
                   value={newFullName}
                   onChange={(e) => setNewFullName(e.target.value)}
                   placeholder="Ej: Gabriel Martínez"
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-allstar-gold"
+                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-amber-500 dark:focus:border-allstar-gold"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1 font-semibold">
+                  <label className="block text-xs font-mono uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1 font-semibold">
                     Correo Electrónico *
                   </label>
                   <input
@@ -398,23 +398,23 @@ export const PartnerManagement: React.FC = () => {
                     value={newEmail}
                     onChange={(e) => setNewEmail(e.target.value)}
                     placeholder="gabriel@allstarticket.com"
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-allstar-gold"
+                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-amber-500 dark:focus:border-allstar-gold"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1 font-semibold">
+                  <label className="block text-xs font-mono uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1 font-semibold">
                     Código de Referido Único *
                   </label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-mono text-sm">@</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 font-mono text-sm">@</span>
                     <input
                       type="text"
                       required
                       value={newReferralCode}
                       onChange={(e) => setNewReferralCode(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''))}
                       placeholder="gabriel"
-                      className="w-full bg-slate-900 border border-slate-700 rounded-xl pl-8 pr-3.5 py-2.5 text-sm text-white font-mono lowercase focus:outline-none focus:border-allstar-gold"
+                      className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl pl-8 pr-3.5 py-2.5 text-sm text-slate-900 dark:text-white font-mono lowercase placeholder:text-slate-400 focus:outline-none focus:border-amber-500 dark:focus:border-allstar-gold"
                     />
                   </div>
                 </div>
@@ -422,7 +422,7 @@ export const PartnerManagement: React.FC = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1 font-semibold">
+                  <label className="block text-xs font-mono uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1 font-semibold">
                     Teléfono / WhatsApp
                   </label>
                   <input
@@ -430,18 +430,18 @@ export const PartnerManagement: React.FC = () => {
                     value={newPhone}
                     onChange={(e) => setNewPhone(e.target.value)}
                     placeholder="+57 310 987 6543"
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-allstar-gold"
+                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-amber-500 dark:focus:border-allstar-gold"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1 font-semibold">
+                  <label className="block text-xs font-mono uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1 font-semibold">
                     Rol Asignado *
                   </label>
                   <select
                     value={newRoleId}
                     onChange={(e) => setNewRoleId(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-allstar-gold font-medium"
+                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 dark:focus:border-allstar-gold font-medium"
                   >
                     {availableRoles.map((r) => (
                       <option key={r._id} value={r._id}>
@@ -453,7 +453,7 @@ export const PartnerManagement: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1 font-semibold">
+                <label className="block text-xs font-mono uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1 font-semibold">
                   Contraseña Inicial de Acceso
                 </label>
                 <input
@@ -461,22 +461,22 @@ export const PartnerManagement: React.FC = () => {
                   required
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-white font-mono focus:outline-none focus:border-allstar-gold"
+                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-900 dark:text-white font-mono placeholder:text-slate-400 focus:outline-none focus:border-amber-500 dark:focus:border-allstar-gold"
                 />
               </div>
 
-              <div className="pt-4 flex justify-end space-x-3 border-t border-white/10">
+              <div className="pt-4 flex justify-end space-x-3 border-t border-slate-200 dark:border-white/10">
                 <button
                   type="button"
                   onClick={() => setShowCreateModal(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs"
+                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs transition-colors"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-5 py-2 rounded-xl bg-allstar-gradient text-black font-extrabold text-xs uppercase tracking-wider shadow-gold hover:opacity-95 disabled:opacity-50"
+                  className="px-5 py-2 rounded-xl bg-allstar-gradient text-black font-extrabold text-xs uppercase tracking-wider shadow-gold hover:opacity-95 disabled:opacity-50 transition-all"
                 >
                   {isSubmitting ? 'Guardando...' : 'Crear Socio'}
                 </button>
@@ -488,16 +488,16 @@ export const PartnerManagement: React.FC = () => {
 
       {/* Modal: Editar Rol del Socio */}
       {editingPartner && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200">
-          <div className="w-full max-w-lg bg-allstar-navy-800 rounded-3xl border border-allstar-gold/40 shadow-2xl overflow-hidden my-8">
-            <div className="px-6 py-4 bg-allstar-navy-900 border-b border-allstar-gold/20 flex items-center justify-between">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-black/80 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200">
+          <div className="w-full max-w-lg bg-white dark:bg-allstar-navy-800 rounded-3xl border border-amber-500/30 dark:border-allstar-gold/40 shadow-2xl overflow-hidden my-8">
+            <div className="px-6 py-4 bg-slate-50 dark:bg-allstar-navy-900 border-b border-slate-200 dark:border-allstar-gold/20 flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <Shield className="w-5 h-5 text-allstar-gold" />
-                <h3 className="font-bold text-white text-base">Modificar Socio & Rol</h3>
+                <Shield className="w-5 h-5 text-amber-600 dark:text-allstar-gold" />
+                <h3 className="font-bold text-slate-900 dark:text-white text-base">Modificar Socio & Rol</h3>
               </div>
               <button
                 onClick={() => setEditingPartner(null)}
-                className="p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+                className="p-1.5 rounded-full bg-slate-200 dark:bg-white/10 hover:bg-slate-300 dark:hover:bg-white/20 text-slate-700 dark:text-white transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -505,19 +505,19 @@ export const PartnerManagement: React.FC = () => {
 
             <form onSubmit={handleUpdatePartner} className="p-6 space-y-4">
               <div>
-                <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1 font-semibold">
+                <label className="block text-xs font-mono uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1 font-semibold">
                   Nombre Completo
                 </label>
                 <input
                   type="text"
                   value={editingPartner.fullName}
                   onChange={(e) => setEditingPartner({ ...editingPartner, fullName: e.target.value })}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-allstar-gold"
+                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 dark:focus:border-allstar-gold"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1 font-semibold">
+                <label className="block text-xs font-mono uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1 font-semibold">
                   Rol Asignado
                 </label>
                 <select
@@ -531,7 +531,7 @@ export const PartnerManagement: React.FC = () => {
                       role: rDoc?.slug || editingPartner.role,
                     });
                   }}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-allstar-gold"
+                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 dark:focus:border-allstar-gold"
                 >
                   {availableRoles.map((r) => (
                     <option key={r._id} value={r._id}>
@@ -542,10 +542,10 @@ export const PartnerManagement: React.FC = () => {
               </div>
 
               {/* Active / Inactive switch */}
-              <div className="flex items-center justify-between p-3 rounded-xl bg-slate-900 border border-slate-700">
+              <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
                 <div>
-                  <span className="text-xs font-bold text-white block">Estado de la Cuenta</span>
-                  <span className="text-[11px] text-slate-400">
+                  <span className="text-xs font-bold text-slate-900 dark:text-white block">Estado de la Cuenta</span>
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400">
                     {editingPartner.isActive ? 'El socio puede acceder al panel' : 'Acceso revocado temporalmente'}
                   </span>
                 </div>
@@ -554,26 +554,26 @@ export const PartnerManagement: React.FC = () => {
                   onClick={() => setEditingPartner({ ...editingPartner, isActive: !editingPartner.isActive })}
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                     editingPartner.isActive
-                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
-                      : 'bg-rose-500/20 text-rose-400 border border-rose-500/40'
+                      ? 'bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/40'
+                      : 'bg-rose-50 dark:bg-rose-500/20 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-500/40'
                   }`}
                 >
                   {editingPartner.isActive ? 'Activo' : 'Inactivo'}
                 </button>
               </div>
 
-              <div className="pt-4 flex justify-end space-x-3 border-t border-white/10">
+              <div className="pt-4 flex justify-end space-x-3 border-t border-slate-200 dark:border-white/10">
                 <button
                   type="button"
                   onClick={() => setEditingPartner(null)}
-                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs"
+                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs transition-colors"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-5 py-2 rounded-xl bg-allstar-gold text-black font-bold text-xs uppercase tracking-wider shadow-gold hover:opacity-95 disabled:opacity-50"
+                  className="px-5 py-2 rounded-xl bg-allstar-gradient text-black font-extrabold text-xs uppercase tracking-wider shadow-gold hover:opacity-95 disabled:opacity-50 transition-all"
                 >
                   {isSubmitting ? 'Guardando...' : 'Guardar Cambios'}
                 </button>

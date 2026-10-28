@@ -140,14 +140,14 @@ export const AdminPage: React.FC = () => {
     return (
       <div className="min-h-[80vh] flex flex-col items-center justify-center text-center px-4 max-w-lg mx-auto py-12">
         <img
-          src="/images/allstar-team-logo.png"
+          src={logoSrc}
           alt="All Star Team"
           className="h-16 sm:h-20 w-auto mx-auto object-contain mb-5 filter drop-shadow-[0_0_25px_rgba(255,170,0,0.4)]"
         />
-        <h1 className="text-3xl font-extrabold font-luxury text-white mb-3">
+        <h1 className="text-3xl font-extrabold font-luxury text-slate-900 dark:text-white mb-3">
           Acceso Privado para Socios
         </h1>
-        <p className="text-slate-400 text-sm mb-6 leading-relaxed">
+        <p className="text-slate-600 dark:text-slate-400 text-sm mb-6 leading-relaxed">
           Para acceder a las métricas en tiempo real, emitir tickets para tus invitados o gestionar la estructura de socios, por favor inicia sesión con tus credenciales.
         </p>
         <Link

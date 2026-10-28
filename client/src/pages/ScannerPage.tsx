@@ -3,15 +3,17 @@ import { Link } from 'react-router-dom';
 import { QRScanner } from '../components/QRScanner.js';
 import { ShieldCheck, Info, Lock, ShieldAlert, ArrowLeft, User, RefreshCw } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.js';
+import { useTheme } from '../context/ThemeContext.js';
 
 export const ScannerPage: React.FC = () => {
   const { user, can, isLoading } = useAuth();
+  const { logoSrc } = useTheme();
 
   if (isLoading) {
     return (
       <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4">
-        <RefreshCw className="w-8 h-8 text-allstar-gold animate-spin mb-3" />
-        <span className="text-xs font-mono uppercase tracking-widest text-slate-400">
+        <RefreshCw className="w-8 h-8 text-amber-600 dark:text-allstar-gold animate-spin mb-3" />
+        <span className="text-xs font-mono uppercase tracking-widest text-slate-500 dark:text-slate-400">
           Verificando credenciales de acceso...
         </span>
       </div>
@@ -23,17 +25,17 @@ export const ScannerPage: React.FC = () => {
     return (
       <div className="min-h-[75vh] flex flex-col items-center justify-center text-center px-4 max-w-md mx-auto py-12">
         <img
-          src="/images/allstar-team-logo.png"
+          src={logoSrc}
           alt="All Star Team"
           className="h-16 sm:h-20 w-auto mx-auto object-contain mb-5 filter drop-shadow-[0_0_25px_rgba(255,170,0,0.4)]"
         />
-        <span className="text-xs font-mono uppercase tracking-widest text-emerald-400 font-bold mb-2">
+        <span className="text-xs font-mono uppercase tracking-widest text-emerald-600 dark:text-emerald-400 font-bold mb-2">
           Terminal de Puerta Protegida
         </span>
-        <h1 className="text-2xl sm:text-3xl font-extrabold font-luxury text-white mb-3">
+        <h1 className="text-2xl sm:text-3xl font-extrabold font-luxury text-slate-900 dark:text-white mb-3">
           Acceso Exclusivo para Recepción
         </h1>
-        <p className="text-slate-400 text-xs sm:text-sm mb-6 leading-relaxed">
+        <p className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm mb-6 leading-relaxed">
           El escáner de validación de entradas no está expuesto al público. Para operar esta terminal en la recepción del evento, debes iniciar sesión con una cuenta de socio o staff autorizada.
         </p>
         <Link
@@ -98,7 +100,7 @@ export const ScannerPage: React.FC = () => {
 
         <div className="flex justify-center mb-3">
           <img
-            src="/images/allstar-team-logo.png"
+            src={logoSrc}
             alt="All Star Team"
             className="h-10 sm:h-12 w-auto object-contain filter drop-shadow-[0_0_15px_rgba(255,170,0,0.35)]"
           />
