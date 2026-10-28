@@ -13,6 +13,9 @@ import {
   PermissionItem,
   CreateRolePayload,
   UpdateRolePayload,
+  RankItem,
+  CreateRankPayload,
+  UpdateRankPayload,
 } from '../types/index.js';
 
 const API_BASE = '/api';
@@ -233,6 +236,47 @@ export const api = {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || 'Error al eliminar rol');
+    return data;
+  },
+
+  // Mantenedor de Rangos Corporativos
+  async getRanks(): Promise<RankItem[]> {
+    const res = await fetch(`${API_BASE}/ranks`, {
+      headers: getAuthHeaders(),
+    });
+    const data = await res.json();
+    return data.ranks || [];
+  },
+
+  async createRank(payload: CreateRankPayload): Promise<{ rank: RankItem; message: string }> {
+    const res = await fetch(`${API_BASE}/ranks`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Error al crear rango');
+    return data;
+  },
+
+  async updateRank(id: string, payload: UpdateRankPayload): Promise<{ rank: RankItem; message: string }> {
+    const res = await fetch(`${API_BASE}/ranks/${id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Error al actualizar rango');
+    return data;
+  },
+
+  async deleteRank(id: string): Promise<{ message: string }> {
+    const res = await fetch(`${API_BASE}/ranks/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Error al eliminar rango');
     return data;
   },
 };

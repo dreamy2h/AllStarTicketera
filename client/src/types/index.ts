@@ -27,6 +27,10 @@ export interface User {
   permissions: string[];
   referralCode: string;
   phone?: string;
+  rankId?: string | null;
+  rank?: string;
+  rankBadge?: string;
+  rankColor?: string;
   isActive: boolean;
   createdAt?: string;
   stats?: {
@@ -120,16 +124,53 @@ export interface CreatePartnerPayload {
   phone?: string;
   role?: string;
   roleId?: string;
+  rankId?: string | null;
   password?: string;
 }
 
 export interface UpdatePartnerPayload {
   fullName?: string;
+  email?: string;
+  referralCode?: string;
   phone?: string;
   role?: string;
   roleId?: string;
+  rankId?: string | null;
   isActive?: boolean;
   password?: string;
+}
+
+export interface RankItem {
+  _id: string;
+  name: string;
+  slug: string;
+  level: number;
+  color: string;
+  badgeText?: string;
+  description?: string;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateRankPayload {
+  name: string;
+  slug?: string;
+  level?: number;
+  color?: string;
+  badgeText?: string;
+  description?: string;
+  isActive?: boolean;
+}
+
+export interface UpdateRankPayload {
+  name?: string;
+  slug?: string;
+  level?: number;
+  color?: string;
+  badgeText?: string;
+  description?: string;
+  isActive?: boolean;
 }
 
 export interface CreateEventPayload {

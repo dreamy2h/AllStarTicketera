@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { User } from '../models/User.js';
 import { Role } from '../models/Role.js';
+import { Rank } from '../models/Rank.js';
 import { Ticket } from '../models/Ticket.js';
 
 export const getPartners = async (req: Request, res: Response): Promise<void> => {
@@ -24,6 +25,7 @@ export const getPartners = async (req: Request, res: Response): Promise<void> =>
         { email: { $regex: term, $options: 'i' } },
         { referralCode: { $regex: term, $options: 'i' } },
         { phone: { $regex: term, $options: 'i' } },
+        { rank: { $regex: term, $options: 'i' } },
       ];
     }
 
@@ -32,6 +34,7 @@ export const getPartners = async (req: Request, res: Response): Promise<void> =>
         path: 'roleId',
         populate: { path: 'permissions' },
       })
+      .populate('rankId')
       .sort({ createdAt: -1 });
 
     // Aggregate stats per partner (total invited and checked in)
@@ -48,6 +51,7 @@ export const getPartners = async (req: Request, res: Response): Promise<void> =>
         });
 
         const roleObj = partner.roleId as any;
+        const rankObj = partner.rankId as any;
 
         return {
           id: partner._id,
@@ -60,6 +64,10 @@ export const getPartners = async (req: Request, res: Response): Promise<void> =>
           permissions: roleObj?.permissions || [],
           referralCode: partner.referralCode,
           phone: partner.phone,
+          rankId: rankObj?._id || null,
+          rank: rankObj?.name || partner.rank || '',
+          rankBadge: rankObj?.badgeText || '',
+          rankColor: rankObj?.color || '',
           isActive: partner.isActive,
           createdAt: partner.createdAt,
           stats: {
@@ -79,7 +87,7 @@ export const getPartners = async (req: Request, res: Response): Promise<void> =>
 
 export const createPartner = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { fullName, email, referralCode, phone, role, roleId, password } = req.body;
+    const { fullName, email, referralCode, phone, role, roleId, rankId, password } = req.body;
 
     if (!fullName || !email || !referralCode) {
       res.status(400).json({
@@ -117,6 +125,17 @@ export const createPartner = async (req: Request, res: Response): Promise<void> 
       }
     }
 
+    // Resolve Rank model if specified
+    let targetRankId = null;
+    let targetRankName = '';
+    if (rankId) {
+      const foundRank = await Rank.findById(rankId);
+      if (foundRank) {
+        targetRankId = foundRank._id;
+        targetRankName = foundRank.name;
+      }
+    }
+
     const userPassword = password && password.trim().length >= 6 ? password.trim() : 'AllStar2026!';
 
     const partner = new User({
@@ -126,16 +145,20 @@ export const createPartner = async (req: Request, res: Response): Promise<void> 
       phone: phone ? phone.trim() : '',
       role: targetRoleSlug,
       roleId: targetRoleId,
+      rankId: targetRankId,
+      rank: targetRankName,
       password: userPassword,
       isActive: true,
     });
 
     await partner.save();
 
-    const populated = await User.findById(partner._id).populate({
-      path: 'roleId',
-      populate: { path: 'permissions' },
-    });
+    const populated = await User.findById(partner._id)
+      .populate({
+        path: 'roleId',
+        populate: { path: 'permissions' },
+      })
+      .populate('rankId');
 
     res.status(201).json({
       success: true,
@@ -151,7 +174,7 @@ export const createPartner = async (req: Request, res: Response): Promise<void> 
 export const updatePartner = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const { fullName, phone, role, roleId, isActive, password } = req.body;
+    const { fullName, email, referralCode, phone, role, roleId, rankId, isActive, password } = req.body;
 
     const partner = await User.findById(id);
     if (!partner) {
@@ -160,6 +183,29 @@ export const updatePartner = async (req: Request, res: Response): Promise<void> 
     }
 
     if (fullName) partner.fullName = fullName.trim();
+
+    // Update and validate Email
+    if (email && email.toLowerCase().trim() !== partner.email) {
+      const cleanEmail = email.toLowerCase().trim();
+      const existingEmail = await User.findOne({ email: cleanEmail, _id: { $ne: id } });
+      if (existingEmail) {
+        res.status(400).json({ success: false, message: 'El correo electrónico ya está registrado por otro socio.' });
+        return;
+      }
+      partner.email = cleanEmail;
+    }
+
+    // Update and validate Referral Code
+    if (referralCode && referralCode.toLowerCase().trim() !== partner.referralCode) {
+      const cleanCode = referralCode.toLowerCase().trim();
+      const existingCode = await User.findOne({ referralCode: cleanCode, _id: { $ne: id } });
+      if (existingCode) {
+        res.status(400).json({ success: false, message: 'El código de referido ya está en uso por otro socio.' });
+        return;
+      }
+      partner.referralCode = cleanCode;
+    }
+
     if (phone !== undefined) partner.phone = phone.trim();
 
     if (roleId) {
@@ -172,6 +218,23 @@ export const updatePartner = async (req: Request, res: Response): Promise<void> 
       if (foundRole) partner.roleId = foundRole._id;
     }
 
+    // Update Rank
+    if (rankId !== undefined) {
+      if (rankId) {
+        const foundRank = await Rank.findById(rankId);
+        if (foundRank) {
+          partner.rankId = foundRank._id as any;
+          partner.rank = foundRank.name;
+        } else {
+          partner.rankId = null as any;
+          partner.rank = '';
+        }
+      } else {
+        partner.rankId = null as any;
+        partner.rank = '';
+      }
+    }
+
     if (typeof isActive === 'boolean') partner.isActive = isActive;
     if (password && password.trim().length >= 6) {
       partner.password = password.trim();
@@ -179,10 +242,12 @@ export const updatePartner = async (req: Request, res: Response): Promise<void> 
 
     await partner.save();
 
-    const populated = await User.findById(partner._id).populate({
-      path: 'roleId',
-      populate: { path: 'permissions' },
-    });
+    const populated = await User.findById(partner._id)
+      .populate({
+        path: 'roleId',
+        populate: { path: 'permissions' },
+      })
+      .populate('rankId');
 
     res.json({
       success: true,

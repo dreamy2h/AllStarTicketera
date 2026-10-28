@@ -16,6 +16,7 @@ interface AuthContextType {
   canViewMetrics: boolean;
   canScanTickets: boolean;
   canManageRoles: boolean;
+  canManageRanks: boolean;
   isAdmin: boolean;
   isLeader: boolean;
   refreshUser: () => Promise<void>;
@@ -97,6 +98,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const canViewMetrics = can('metrics:view');
   const canScanTickets = can('scanner:access');
   const canManageRoles = can('roles:manage');
+  const canManageRanks = can('ranks:manage') || isAdmin;
 
   return (
     <AuthContext.Provider
@@ -114,6 +116,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         canViewMetrics,
         canScanTickets,
         canManageRoles,
+        canManageRanks,
         isAdmin,
         isLeader,
         refreshUser,

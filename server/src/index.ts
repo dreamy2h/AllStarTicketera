@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { connectDB } from './config/db.js';
 import apiRouter from './routes/index.js';
 import { seedDatabase } from './utils/seedData.js';
+import { ensureRanksAndPermissions } from './utils/ensureRanksAndPermissions.js';
 
 dotenv.config();
 
@@ -52,6 +53,7 @@ const startServer = async () => {
   try {
     await connectDB();
     await seedDatabase();
+    await ensureRanksAndPermissions();
 
     app.listen(PORT, () => {
       console.log(`🚀 Servidor AllStar Ticket ejecutándose en puerto ${PORT}`);

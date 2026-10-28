@@ -12,6 +12,8 @@ export interface IUser extends Document {
   customPermissions?: Types.ObjectId[] | IPermission[];
   referralCode: string;
   phone?: string;
+  rankId?: Types.ObjectId | any;
+  rank?: string;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -63,6 +65,17 @@ const UserSchema = new Schema<IUser>(
       trim: true,
     },
     phone: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    rankId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Rank',
+      index: true,
+      default: null,
+    },
+    rank: {
       type: String,
       trim: true,
       default: '',
