@@ -18,7 +18,10 @@ import {
   UpdateRankPayload,
 } from '../types/index.js';
 
-const API_BASE = '/api';
+const rawApiUrl = import.meta.env.VITE_API_URL || '';
+const API_BASE = rawApiUrl
+  ? (rawApiUrl.endsWith('/api') ? rawApiUrl : `${rawApiUrl.replace(/\/+$/, '')}/api`)
+  : '/api';
 
 const getAuthHeaders = (): Record<string, string> => {
   const token = localStorage.getItem('allstar_token');
