@@ -195,7 +195,7 @@ export const PartnerManagement: React.FC = () => {
       )}
 
       {/* Filter and Search Bar */}
-      <div className="card-luxury rounded-2xl p-4 border border-white/10 flex flex-col md:flex-row gap-3 items-center justify-between">
+      <div className="card-luxury rounded-2xl p-4 border border-slate-200 dark:border-white/10 flex flex-col md:flex-row gap-3 items-center justify-between">
         <div className="relative w-full md:w-80">
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
@@ -203,7 +203,7 @@ export const PartnerManagement: React.FC = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Buscar por nombre, correo, código..."
-            className="w-full pl-9 pr-4 py-2 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-allstar-gold"
+            className="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-amber-500 dark:focus:border-allstar-gold"
           />
         </div>
 
@@ -212,7 +212,7 @@ export const PartnerManagement: React.FC = () => {
           <select
             value={selectedRole}
             onChange={(e) => setSelectedRole(e.target.value)}
-            className="bg-slate-900 border border-slate-700 text-xs text-white rounded-xl px-3 py-2 focus:outline-none focus:border-allstar-gold"
+            className="bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs text-slate-800 dark:text-white rounded-xl px-3 py-2 focus:outline-none focus:border-amber-500 dark:focus:border-allstar-gold"
           >
             <option value="all">Todos los Roles</option>
             {availableRoles.map((r) => (
@@ -226,7 +226,7 @@ export const PartnerManagement: React.FC = () => {
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="bg-slate-900 border border-slate-700 text-xs text-white rounded-xl px-3 py-2 focus:outline-none focus:border-allstar-gold"
+            className="bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs text-slate-800 dark:text-white rounded-xl px-3 py-2 focus:outline-none focus:border-amber-500 dark:focus:border-allstar-gold"
           >
             <option value="all">Todos los Estados</option>
             <option value="active">Activos</option>
@@ -236,10 +236,10 @@ export const PartnerManagement: React.FC = () => {
       </div>
 
       {/* Partners Table */}
-      <div className="card-luxury rounded-2xl border border-white/10 overflow-hidden">
+      <div className="card-luxury rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-slate-900/60 border-b border-white/10 text-[11px] font-mono uppercase text-slate-400">
+            <thead className="bg-slate-50 dark:bg-slate-900/60 border-b border-slate-200 dark:border-white/10 text-[11px] font-mono uppercase text-slate-600 dark:text-slate-400">
               <tr>
                 <th className="py-3 px-4 font-semibold">Socio / Contacto</th>
                 <th className="py-3 px-4 font-semibold">Código Referido</th>
@@ -249,49 +249,49 @@ export const PartnerManagement: React.FC = () => {
                 <th className="py-3 px-4 font-semibold text-right">Acciones</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-slate-100 dark:divide-white/5">
               {isLoading ? (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-slate-400">
+                  <td colSpan={6} className="py-8 text-center text-slate-500 dark:text-slate-400">
                     Cargando lista de socios...
                   </td>
                 </tr>
               ) : partners.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-slate-400">
+                  <td colSpan={6} className="py-8 text-center text-slate-500 dark:text-slate-400">
                     No se encontraron socios registrados.
                   </td>
                 </tr>
               ) : (
                 partners.map((partner) => (
-                  <tr key={partner._id} className="hover:bg-white/[0.02] transition-colors">
+                  <tr key={partner._id} className="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors">
                     {/* User info */}
                     <td className="py-3.5 px-4">
-                      <div className="font-semibold text-white flex items-center space-x-2">
+                      <div className="font-semibold text-slate-900 dark:text-white flex items-center space-x-2">
                         <span>{partner.fullName}</span>
                         {partner._id === currentUser?.id && (
-                          <span className="text-[10px] px-1.5 py-0.2 rounded bg-allstar-gold/20 text-allstar-gold font-mono">
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-allstar-gold font-mono font-bold border border-amber-500/25">
                             Tú
                           </span>
                         )}
                       </div>
-                      <div className="text-xs text-slate-400">{partner.email}</div>
-                      {partner.phone && <div className="text-[11px] text-slate-500">{partner.phone}</div>}
+                      <div className="text-xs text-slate-500 dark:text-slate-400">{partner.email}</div>
+                      {partner.phone && <div className="text-[11px] text-slate-400 dark:text-slate-500">{partner.phone}</div>}
                     </td>
 
                     {/* Referral Code */}
                     <td className="py-3.5 px-4">
                       <div className="flex items-center space-x-1.5">
-                        <span className="font-mono text-xs font-bold text-sky-400 bg-sky-950/60 px-2 py-0.5 rounded border border-sky-800">
+                        <span className="font-mono text-xs font-bold text-sky-700 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/60 px-2.5 py-0.5 rounded-md border border-sky-200 dark:border-sky-800">
                           @{partner.referralCode}
                         </span>
                         <button
                           onClick={() => handleCopyCode(partner.referralCode)}
-                          className="p-1 text-slate-400 hover:text-white transition-colors"
+                          className="p-1 text-slate-400 hover:text-slate-700 dark:hover:text-white transition-colors"
                           title="Copiar enlace de referido"
                         >
                           {copiedCode === partner.referralCode ? (
-                            <Check className="w-3.5 h-3.5 text-emerald-400" />
+                            <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                           ) : (
                             <Copy className="w-3.5 h-3.5" />
                           )}
@@ -301,18 +301,18 @@ export const PartnerManagement: React.FC = () => {
 
                     {/* Role Display */}
                     <td className="py-3.5 px-4">
-                      <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-bold bg-white/5 border border-white/10 text-allstar-gold font-mono">
-                        <Shield className="w-3 h-3 text-allstar-gold" />
+                      <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 dark:bg-white/5 border border-amber-200/80 dark:border-white/10 text-amber-800 dark:text-allstar-gold font-mono">
+                        <Shield className="w-3 h-3 text-amber-600 dark:text-allstar-gold" />
                         <span>{partner.roleName || partner.role}</span>
                       </span>
                     </td>
 
                     {/* Invited stats */}
                     <td className="py-3.5 px-4 text-center">
-                      <div className="font-bold text-white text-sm">
+                      <div className="font-bold text-slate-900 dark:text-white text-sm">
                         {partner.stats?.totalInvited || 0}
                       </div>
-                      <div className="text-[10px] text-emerald-400 font-mono">
+                      <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-mono font-semibold">
                         {partner.stats?.totalCheckedIn || 0} check-in
                       </div>
                     </td>
@@ -320,11 +320,11 @@ export const PartnerManagement: React.FC = () => {
                     {/* Status */}
                     <td className="py-3.5 px-4 text-center">
                       {partner.isActive ? (
-                        <span className="inline-block px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                        <span className="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/40">
                           Activo
                         </span>
                       ) : (
-                        <span className="inline-block px-2 py-0.5 rounded text-[11px] font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/40">
+                        <span className="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 dark:bg-rose-500/20 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-500/40">
                           Inactivo
                         </span>
                       )}
@@ -334,7 +334,7 @@ export const PartnerManagement: React.FC = () => {
                     <td className="py-3.5 px-4 text-right">
                       <button
                         onClick={() => setEditingPartner({ ...partner })}
-                        className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors"
+                        className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
                         title="Modificar rol y estado"
                       >
                         <Edit2 className="w-3.5 h-3.5" />
