@@ -33,7 +33,8 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=5000
-      - MONGODB_URI=mongodb://mongo:27017/allstar_tickets
+      # - MONGODB_URI=mongodb://mongo:27017/allstar_tickets
+      - MONGODB_URI=mongodb+srv://zamyr4a22_db_user:weu6cZNswNtgNAOU@allstar.a05o782.mongodb.net/allstar_tickets?retryWrites=true&w=majority
       - CLIENT_URL=http://localhost:3000
       - JWT_SECRET=${JWT_SECRET:-allstar_super_secret_jwt_key_2026}
       - RESEND_API_KEY=${RESEND_API_KEY:-}
