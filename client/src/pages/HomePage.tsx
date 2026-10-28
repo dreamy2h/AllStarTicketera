@@ -214,7 +214,7 @@ export const HomePage: React.FC = () => {
           <div className="p-2.5 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 w-fit">
             <QrCode className="w-5 h-5" />
           </div>
-          <h4 className="font-bold text-slate-900 dark:text-white text-base">Scanner Móvil html5-qrcode</h4>
+          <h4 className="font-bold text-slate-900 dark:text-white text-base">Scanner Móvil</h4>
           <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
             Recepción en puerta rápida con cámara web/móvil, linterna integrada, sonido de confirmación y detección automática de tickets duplicados con hora exacta.
           </p>
@@ -226,7 +226,7 @@ export const HomePage: React.FC = () => {
           </div>
           <h4 className="font-bold text-slate-900 dark:text-white text-base">Atribución de Socios & Métricas</h4>
           <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-            Seguimiento de líderes por código de referido (`?ref=zamyr`), tabla de liderazgo en vivo y exportación instantánea a Excel/CSV con compatibilidad UTF-8.
+            Seguimiento de líderes por código de referido (`?ref=zamyr`), tabla de liderazgo en vivo y exportación instantánea a Excel/CSV.
           </p>
         </div>
       </div>
