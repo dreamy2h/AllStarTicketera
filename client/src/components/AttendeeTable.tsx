@@ -78,7 +78,7 @@ export const AttendeeTable: React.FC<AttendeeTableProps> = ({
   return (
     <div className="card-luxury rounded-2xl border border-white/10 overflow-hidden">
       {/* Controls Header */}
-      <div className="p-5 border-b border-white/10 flex flex-col md:flex-row gap-4 items-center justify-between">
+      <div className="p-5 border-b border-slate-200 dark:border-white/10 flex flex-col md:flex-row gap-4 items-center justify-between">
         {/* Search */}
         <div className="relative w-full md:w-80">
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -87,7 +87,7 @@ export const AttendeeTable: React.FC<AttendeeTableProps> = ({
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Buscar por nombre, email o código..."
-            className="w-full pl-9 pr-4 py-2 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-allstar-gold"
+            className="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-amber-500"
           />
         </div>
 
@@ -97,7 +97,7 @@ export const AttendeeTable: React.FC<AttendeeTableProps> = ({
           <select
             value={selectedPartnerId}
             onChange={(e) => setSelectedPartnerId(e.target.value)}
-            className="bg-slate-900 border border-slate-700 text-xs text-white rounded-xl px-3 py-2 focus:outline-none focus:border-allstar-gold"
+            className="bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs text-slate-800 dark:text-white rounded-xl px-3 py-2 focus:outline-none focus:border-amber-500"
           >
             <option value="all">Todos los Socios</option>
             <option value="direct">Directo / Sin Referidor</option>
@@ -112,7 +112,7 @@ export const AttendeeTable: React.FC<AttendeeTableProps> = ({
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="bg-slate-900 border border-slate-700 text-xs text-white rounded-xl px-3 py-2 focus:outline-none focus:border-allstar-gold"
+            className="bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs text-slate-800 dark:text-white rounded-xl px-3 py-2 focus:outline-none focus:border-amber-500"
           >
             <option value="all">Todos los Estados</option>
             <option value="registered">Inscritos (Pendientes)</option>
@@ -122,10 +122,10 @@ export const AttendeeTable: React.FC<AttendeeTableProps> = ({
           {/* CSV Export Button */}
           <button
             onClick={handleDownloadCsv}
-            className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-semibold text-xs active:scale-95 transition-all shadow-md ml-auto"
+            className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-600 dark:text-white font-semibold text-xs active:scale-95 transition-all shadow-sm ml-auto"
             title="Descargar lista completa compatible con Excel"
           >
-            <Download className="w-4 h-4 text-allstar-gold" />
+            <Download className="w-4 h-4 text-amber-600 dark:text-allstar-gold" />
             <span>Exportar CSV / Excel</span>
           </button>
         </div>
@@ -134,7 +134,7 @@ export const AttendeeTable: React.FC<AttendeeTableProps> = ({
       {/* Table */}
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
-          <thead className="bg-slate-900/60 border-b border-white/10 text-[11px] font-mono uppercase text-slate-400">
+          <thead className="bg-slate-50 dark:bg-slate-900/60 border-b border-slate-200 dark:border-white/10 text-[11px] font-mono uppercase text-slate-500 dark:text-slate-400">
             <tr>
               <th className="py-3 px-4 font-semibold">Código / Pase</th>
               <th className="py-3 px-4 font-semibold">Asistente</th>
@@ -144,10 +144,10 @@ export const AttendeeTable: React.FC<AttendeeTableProps> = ({
               <th className="py-3 px-4 font-semibold text-right">Acciones</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/5">
+          <tbody className="divide-y divide-slate-100 dark:divide-white/5">
             {filteredAttendees.length === 0 ? (
               <tr>
-                <td colSpan={6} className="py-8 text-center text-slate-400">
+                <td colSpan={6} className="py-8 text-center text-slate-500 dark:text-slate-400">
                   No se encontraron asistentes con los filtros seleccionados.
                 </td>
               </tr>
@@ -167,37 +167,37 @@ export const AttendeeTable: React.FC<AttendeeTableProps> = ({
                 });
 
                 return (
-                  <tr key={t._id} className="hover:bg-white/[0.02] transition-colors">
+                  <tr key={t._id} className="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors">
                     {/* Code */}
                     <td className="py-3 px-4">
                       <button
                         onClick={() => onSelectTicketForPass(t)}
-                        className="font-mono text-xs font-bold text-allstar-gold hover:underline flex items-center space-x-1"
+                        className="font-mono text-xs font-bold text-amber-600 dark:text-allstar-gold hover:underline flex items-center space-x-1"
                       >
                         <QrCode className="w-3.5 h-3.5" />
                         <span>{t.ticketCode}</span>
                       </button>
-                      <span className="text-[10px] text-slate-500 block font-mono">
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-mono">
                         {new Date(t.createdAt).toLocaleDateString('es-ES')}
                       </span>
                     </td>
 
                     {/* Attendee Info */}
                     <td className="py-3 px-4">
-                      <div className="font-semibold text-white">{t.attendeeName}</div>
-                      <div className="text-xs text-slate-400">{t.attendeeEmail}</div>
+                      <div className="font-semibold text-slate-900 dark:text-white">{t.attendeeName}</div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400">{t.attendeeEmail}</div>
                       {t.attendeePhone && (
-                        <div className="text-xs text-slate-500">{t.attendeePhone}</div>
+                        <div className="text-xs text-slate-500 dark:text-slate-400">{t.attendeePhone}</div>
                       )}
                     </td>
 
                     {/* Ticket Type */}
                     <td className="py-3 px-4">
-                      <span className="text-xs px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-slate-300 font-medium">
+                      <span className="text-xs px-2.5 py-1 rounded-md bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 font-medium">
                         {ticketType?.name || 'General'}
                       </span>
                       {ticketType && ticketType.price > 0 && (
-                        <span className="text-xs text-allstar-gold ml-1 font-bold">
+                        <span className="text-xs text-amber-600 dark:text-allstar-gold ml-1 font-bold">
                           ${ticketType.price}
                         </span>
                       )}
@@ -207,13 +207,13 @@ export const AttendeeTable: React.FC<AttendeeTableProps> = ({
                     <td className="py-3 px-4">
                       {partner ? (
                         <div>
-                          <div className="text-xs font-semibold text-sky-400">{partner.fullName}</div>
-                          <span className="text-[10px] font-mono text-slate-400">
+                          <div className="text-xs font-semibold text-sky-700 dark:text-sky-400">{partner.fullName}</div>
+                          <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400">
                             @{partner.referralCode}
                           </span>
                         </div>
                       ) : (
-                        <span className="text-xs text-slate-500 italic">Directo</span>
+                        <span className="text-xs text-slate-400 dark:text-slate-500 italic">Directo</span>
                       )}
                     </td>
 
@@ -221,12 +221,12 @@ export const AttendeeTable: React.FC<AttendeeTableProps> = ({
                     <td className="py-3 px-4 text-center">
                       {t.status === 'checked_in' ? (
                         <div className="inline-flex flex-col items-center">
-                          <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
+                          <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-500/40">
                             <CheckCircle className="w-3 h-3" />
                             <span>En Recinto</span>
                           </span>
                           {t.checkedInAt && (
-                            <span className="text-[10px] font-mono text-slate-400 mt-0.5">
+                            <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 mt-0.5">
                               {new Date(t.checkedInAt).toLocaleTimeString('es-ES', {
                                 hour: '2-digit',
                                 minute: '2-digit',
@@ -235,7 +235,7 @@ export const AttendeeTable: React.FC<AttendeeTableProps> = ({
                           )}
                         </div>
                       ) : (
-                        <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                        <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30">
                           <Clock className="w-3 h-3" />
                           <span>Pendiente</span>
                         </span>
@@ -262,7 +262,7 @@ export const AttendeeTable: React.FC<AttendeeTableProps> = ({
                           href={whatsappUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 border border-emerald-500/40 transition-colors"
+                          className="p-1.5 rounded-lg bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/30 border border-emerald-500/40 transition-colors"
                           title="Enviar Pase por WhatsApp"
                         >
                           <MessageSquare className="w-3.5 h-3.5" />
@@ -271,7 +271,7 @@ export const AttendeeTable: React.FC<AttendeeTableProps> = ({
                         {/* View Boarding Pass Modal */}
                         <button
                           onClick={() => onSelectTicketForPass(t)}
-                          className="p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
+                          className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-700 dark:border-transparent transition-colors"
                           title="Ver Boarding Pass"
                         >
                           <ExternalLink className="w-3.5 h-3.5" />
@@ -287,7 +287,7 @@ export const AttendeeTable: React.FC<AttendeeTableProps> = ({
       </div>
 
       {/* Footer Info */}
-      <div className="p-4 bg-slate-900/60 border-t border-white/10 text-xs text-slate-400 flex justify-between items-center">
+      <div className="p-4 bg-slate-50 dark:bg-slate-900/60 border-t border-slate-200 dark:border-white/10 text-xs text-slate-500 dark:text-slate-400 flex justify-between items-center">
         <span>Mostrando {filteredAttendees.length} de {attendees.length} asistentes</span>
         <span className="font-mono text-[11px] text-slate-500">Actualizado en tiempo real</span>
       </div>

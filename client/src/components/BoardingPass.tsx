@@ -57,7 +57,7 @@ export const BoardingPass: React.FC<BoardingPassProps> = ({ ticket, showActions 
       const dataUrl = await toPng(passRef.current, {
         pixelRatio: 3,
         quality: 1,
-        backgroundColor: '#060b17',
+        backgroundColor: '#09090b',
       });
 
       const link = document.createElement('a');
@@ -92,30 +92,32 @@ export const BoardingPass: React.FC<BoardingPassProps> = ({ ticket, showActions 
       {/* Boarding Pass Container */}
       <div
         ref={passRef}
-        className="w-full bg-[#0a1226] text-white rounded-2xl border border-allstar-gold/40 shadow-2xl overflow-hidden relative"
+        className="w-full bg-[#0e0e13] text-white rounded-2xl border border-allstar-gold/40 shadow-2xl overflow-hidden relative boarding-pass-isolated"
         style={{
           backgroundImage:
-            'radial-gradient(circle at 85% 15%, rgba(212, 175, 55, 0.08) 0%, transparent 60%), radial-gradient(circle at 10% 85%, rgba(30, 58, 138, 0.2) 0%, transparent 50%)',
+            'radial-gradient(circle at 85% 15%, rgba(255, 170, 0, 0.12) 0%, transparent 60%), radial-gradient(circle at 10% 85%, rgba(255, 85, 0, 0.08) 0%, transparent 50%)',
         }}
       >
-        {/* Pass Header Banner */}
-        <div className="bg-gradient-to-r from-[#0d162f] via-[#16234b] to-[#0d162f] px-6 py-4 border-b border-allstar-gold/30 flex items-center justify-between flex-wrap gap-2">
+        {/* Pass Header Banner with Official All Star Team Logo */}
+        <div className="bg-gradient-to-r from-[#141419] via-[#1c1c24] to-[#141419] px-6 py-4 border-b border-allstar-gold/30 flex items-center justify-between flex-wrap gap-3">
           <div className="flex items-center space-x-3">
-            <div className="p-2 rounded-lg bg-allstar-gold/20 border border-allstar-gold/40 text-allstar-gold">
-              <Compass className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="text-[10px] tracking-[0.25em] text-allstar-gold uppercase font-mono font-bold">
-                ALLSTAR LUXURY TRAVEL & EXPEDITIONS
+            <img
+              src="/images/allstar-team-logo.png"
+              alt="All Star Team"
+              className="h-8 sm:h-9 w-auto object-contain filter drop-shadow-[0_0_10px_rgba(255,170,0,0.35)]"
+            />
+            <div className="border-l border-white/15 pl-2.5">
+              <div className="text-[9px] tracking-[0.25em] text-allstar-gold uppercase font-mono font-bold">
+                PLATAFORMA OFICIAL
               </div>
-              <h2 className="text-sm sm:text-base font-bold font-luxury tracking-wider text-white">
-                BOARDING PASS • PASE DE ABORDAJE
+              <h2 className="text-xs sm:text-sm font-bold font-luxury tracking-wider text-white">
+                PASE DE ABORDAJE • BOARDING PASS
               </h2>
             </div>
           </div>
 
           <div className="flex items-center space-x-2">
-            <span className="text-[11px] font-mono uppercase px-3 py-1 rounded-full bg-allstar-gold/20 text-allstar-gold border border-allstar-gold/40 font-bold tracking-wider">
+            <span className="text-[11px] font-mono uppercase px-3 py-1 rounded-full bg-allstar-gold/20 text-allstar-gold border border-allstar-gold/40 font-bold tracking-wider shadow-sm">
               {ticketType?.name || 'PASE OFICIAL'}
             </span>
           </div>
@@ -275,7 +277,7 @@ export const BoardingPass: React.FC<BoardingPassProps> = ({ ticket, showActions 
           <button
             onClick={handleDownloadImage}
             disabled={isDownloading}
-            className="flex items-center justify-center space-x-2 py-3 px-4 rounded-xl bg-gradient-to-r from-allstar-gold to-amber-600 text-black font-bold text-sm shadow-gold hover:opacity-95 active:scale-95 transition-all disabled:opacity-50"
+            className="flex items-center justify-center space-x-2 py-3 px-4 rounded-xl bg-allstar-gradient text-black font-extrabold text-sm shadow-gold hover:opacity-95 active:scale-95 transition-all disabled:opacity-50"
           >
             <Download className="w-4 h-4" />
             <span>{isDownloading ? 'Generando Pase...' : 'Descargar Pase (HD)'}</span>
@@ -295,9 +297,9 @@ export const BoardingPass: React.FC<BoardingPassProps> = ({ ticket, showActions 
           {/* Copy Link Button */}
           <button
             onClick={handleCopyLink}
-            className="flex items-center justify-center space-x-2 py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-semibold text-sm active:scale-95 transition-all"
+            className="flex items-center justify-center space-x-2 py-3 px-4 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 font-semibold text-sm shadow-sm active:scale-95 transition-all"
           >
-            {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+            {copied ? <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" /> : <Copy className="w-4 h-4" />}
             <span>{copied ? '¡Enlace Copiado!' : 'Copiar Enlace'}</span>
           </button>
         </div>

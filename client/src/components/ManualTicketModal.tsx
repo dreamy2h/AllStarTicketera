@@ -188,7 +188,7 @@ export const ManualTicketModal: React.FC<ManualTicketModalProps> = ({
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-allstar-gold to-amber-600 text-black font-bold text-sm shadow-gold hover:opacity-95 active:scale-95 transition-all disabled:opacity-50 flex items-center space-x-2"
+                  className="px-6 py-2.5 rounded-xl bg-allstar-gradient text-black font-extrabold text-sm shadow-gold hover:opacity-95 active:scale-95 transition-all disabled:opacity-50 flex items-center space-x-2"
                 >
                   <Sparkles className="w-4 h-4" />
                   <span>{isLoading ? 'Generando...' : 'Generar Pase'}</span>

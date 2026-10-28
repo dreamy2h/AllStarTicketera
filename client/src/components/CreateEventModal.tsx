@@ -336,7 +336,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({ onClose, onS
             <button
               type="submit"
               disabled={isLoading}
-              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-allstar-gold to-amber-600 text-black font-bold text-xs uppercase tracking-wider shadow-gold hover:opacity-95 disabled:opacity-50 flex items-center space-x-2"
+              className="px-6 py-2.5 rounded-xl bg-allstar-gradient text-black font-extrabold text-xs uppercase tracking-wider shadow-gold hover:opacity-95 disabled:opacity-50 flex items-center space-x-2"
             >
               <Sparkles className="w-4 h-4" />
               <span>{isLoading ? 'Publicando...' : 'Publicar Evento'}</span>

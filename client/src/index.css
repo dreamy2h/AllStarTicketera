@@ -3,10 +3,35 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --bg-app: #f8fafc;
+    --bg-card: #ffffff;
+    --bg-card-subtle: #f1f5f9;
+    --text-main: #0f172a;
+    --text-sub: #334155;
+    --text-muted: #64748b;
+    --border-card: rgba(255, 170, 0, 0.35);
+    --border-subtle: #e2e8f0;
+    --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 0 15px rgba(255, 170, 0, 0.08);
+  }
+
+  .dark {
+    --bg-app: #09090b;
+    --bg-card: #18181d;
+    --bg-card-subtle: #111114;
+    --text-main: #f1f5f9;
+    --text-sub: #cbd5e1;
+    --text-muted: #94a3b8;
+    --border-card: rgba(255, 170, 0, 0.25);
+    --border-subtle: #27272a;
+    --shadow-card: 0 10px 30px -5px rgba(0, 0, 0, 0.7), 0 0 20px rgba(255, 136, 0, 0.12);
+  }
+
   body {
-    background-color: #060b17;
-    color: #e2e8f0;
+    background-color: var(--bg-app);
+    color: var(--text-main);
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 
   h1, h2, h3, .font-heading {
@@ -20,7 +45,7 @@
 
 /* Custom Boarding Pass perforation line */
 .perforated-edge {
-  background-image: radial-gradient(circle at 10px 0, transparent 0, transparent 10px, #0f172a 11px);
+  background-image: radial-gradient(circle at 10px 0, transparent 0, transparent 10px, #141418 11px);
 }
 
 .ticket-notch-left {
@@ -28,9 +53,9 @@
   left: -12px;
   width: 24px;
   height: 24px;
-  background-color: #060b17;
+  background-color: var(--bg-app);
   border-radius: 9999px;
-  box-shadow: inset -2px 0 3px rgba(0, 0, 0, 0.4);
+  box-shadow: inset -2px 0 3px rgba(0, 0, 0, 0.3);
 }
 
 .ticket-notch-right {
@@ -38,26 +63,129 @@
   right: -12px;
   width: 24px;
   height: 24px;
-  background-color: #060b17;
+  background-color: var(--bg-app);
   border-radius: 9999px;
-  box-shadow: inset 2px 0 3px rgba(0, 0, 0, 0.4);
+  box-shadow: inset 2px 0 3px rgba(0, 0, 0, 0.3);
 }
 
-/* Metallic gold gradients */
+/* Metallic gold-to-orange gradients (Inspirada en el logo ALL STAR TEAM) */
 .gold-gradient-text {
-  background: linear-gradient(135deg, #f7e7a9 0%, #d4af37 50%, #aa820a 100%);
+  background: linear-gradient(135deg, #CC3300 0%, #FF5500 25%, #FF8800 50%, #FFAA00 75%, #D49B00 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.dark .gold-gradient-text {
+  background: linear-gradient(135deg, #FFFFFF 0%, #FFD700 25%, #FFAA00 55%, #FF8800 80%, #FF5500 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .gold-gradient-bg {
-  background: linear-gradient(135deg, #f7e7a9 0%, #d4af37 50%, #aa820a 100%);
+  background: linear-gradient(135deg, #FFD700 0%, #FFAA00 40%, #FF8800 75%, #FF5500 100%);
+}
+
+.bg-allstar-gradient {
+  background: linear-gradient(135deg, #FFD700 0%, #FFAA00 35%, #FF8800 70%, #FF5500 100%) !important;
+  color: #000000 !important;
+}
+.bg-allstar-gradient:hover {
+  opacity: 0.95;
+  box-shadow: 0 0 35px rgba(255, 170, 0, 0.45);
 }
 
 .card-luxury {
-  background: linear-gradient(160deg, #111a33 0%, #0c1326 100%);
-  border: 1px solid rgba(212, 175, 55, 0.25);
-  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5), 0 0 15px rgba(212, 175, 55, 0.08);
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  box-shadow: var(--shadow-card);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Light mode specific element adaptations */
+html.light .card-luxury {
+  background: #ffffff !important;
+  border-color: rgba(255, 170, 0, 0.35) !important;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.06), 0 0 20px rgba(255, 170, 0, 0.08) !important;
+}
+
+html.light nav {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-bottom-color: rgba(226, 232, 240, 0.9) !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+html.light footer {
+  border-top-color: #e2e8f0 !important;
+  background-color: #ffffff !important;
+}
+
+html.light input,
+html.light select,
+html.light textarea {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+html.light input::placeholder,
+html.light textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* Light mode typography & contrast enhancements */
+html.light h1:not(.gold-gradient-text):not(.boarding-pass-isolated *),
+html.light h2:not(.gold-gradient-text):not(.boarding-pass-isolated *),
+html.light h3:not(.gold-gradient-text):not(.boarding-pass-isolated *),
+html.light h4:not(.gold-gradient-text):not(.boarding-pass-isolated *) {
+  color: #0f172a;
+}
+
+/* Light mode text contrast overrides inside cards and tables */
+html.light .card-luxury .text-white:not(button.bg-emerald-600 *):not(button.bg-sky-600 *):not(button.bg-rose-600 *):not(button.bg-allstar-gradient *):not(.badge-solid *) {
+  color: #0f172a;
+}
+
+html.light .card-luxury .text-slate-300 {
+  color: #334155;
+}
+
+html.light .card-luxury .text-slate-400 {
+  color: #64748b;
+}
+
+/* Light mode tables */
+html.light thead {
+  background-color: #f1f5f9 !important;
+  color: #475569 !important;
+}
+
+html.light thead th {
+  color: #475569 !important;
+}
+
+html.light tbody tr {
+  border-bottom-color: #e2e8f0 !important;
+}
+
+html.light tbody tr:hover {
+  background-color: #f8fafc !important;
+}
+
+/* Light mode modals */
+html.light .fixed.inset-0 .card-luxury {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+}
+
+html.light .fixed.inset-0 .card-luxury .text-white {
+  color: #0f172a;
+}
+
+/* Preserve Boarding Pass internal isolation */
+.boarding-pass-isolated {
+  background-color: #0e0e13 !important;
+  color: #ffffff !important;
 }
 
 /* Scanner target box animation */

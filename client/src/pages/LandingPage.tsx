@@ -94,7 +94,7 @@ export const LandingPage: React.FC = () => {
           particleCount: 120,
           spread: 80,
           origin: { y: 0.5 },
-          colors: ['#d4af37', '#f3e5ab', '#10b981', '#ffffff'],
+          colors: ['#FFD700', '#FFAA00', '#FF8800', '#FF5500', '#ffffff'],
         });
       } catch (e) {
         // Safe fallback
@@ -185,22 +185,22 @@ export const LandingPage: React.FC = () => {
         <div className="space-y-10">
           {/* Host Referrer Banner */}
           {referrer && (
-            <div className="p-4 rounded-2xl bg-gradient-to-r from-sky-950/60 via-slate-900 to-sky-950/60 border border-sky-500/40 flex items-center justify-between flex-wrap gap-3 shadow-lg">
+            <div className="p-4 rounded-2xl bg-gradient-to-r from-sky-50 via-white to-sky-50 dark:from-sky-950/60 dark:via-slate-900 dark:to-sky-950/60 border border-sky-200 dark:border-sky-500/40 flex items-center justify-between flex-wrap gap-3 shadow-md">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-full bg-sky-500/20 border border-sky-400 flex items-center justify-center text-sky-300 font-bold text-sm">
+                <div className="w-10 h-10 rounded-full bg-sky-100 dark:bg-sky-500/20 border border-sky-300 dark:border-sky-400 flex items-center justify-center text-sky-700 dark:text-sky-300 font-bold text-sm">
                   {referrer.fullName.charAt(0)}
                 </div>
                 <div>
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-sky-400 block font-bold">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-sky-700 dark:text-sky-400 block font-bold">
                     Invitación VIP Exclusiva de tu Socio Anfitrión:
                   </span>
-                  <span className="text-sm sm:text-base font-bold text-white">
-                    {referrer.fullName} <span className="text-xs font-mono text-sky-300">(@{referrer.referralCode})</span>
+                  <span className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
+                    {referrer.fullName} <span className="text-xs font-mono text-sky-700 dark:text-sky-300">(@{referrer.referralCode})</span>
                   </span>
                 </div>
               </div>
 
-              <div className="px-3 py-1 rounded-full bg-sky-500/20 text-sky-300 border border-sky-400/40 text-xs font-semibold">
+              <div className="px-3 py-1 rounded-full bg-sky-100 text-sky-800 border border-sky-300 dark:bg-sky-500/20 dark:text-sky-300 dark:border-sky-400/40 text-xs font-semibold">
                 Pase de Cortesía Activado
               </div>
             </div>
@@ -208,28 +208,28 @@ export const LandingPage: React.FC = () => {
 
           {/* Hero Header */}
           <div className="text-center space-y-4 max-w-3xl mx-auto">
-            <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-allstar-gold/15 border border-allstar-gold/30 text-allstar-gold text-xs font-mono font-bold tracking-widest uppercase">
+            <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-700 dark:text-allstar-gold text-xs font-mono font-bold tracking-widest uppercase">
               <Compass className="w-3.5 h-3.5" />
               <span>Experiencia de Liderazgo & Estilo de Vida</span>
             </div>
 
-            <h1 className="text-3xl sm:text-5xl font-black font-luxury text-white tracking-tight leading-tight">
+            <h1 className="text-3xl sm:text-5xl font-black font-luxury text-slate-900 dark:text-white tracking-tight leading-tight">
               {event.title}
             </h1>
 
-            <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-slate-300 pt-2">
-              <div className="flex items-center space-x-1.5 bg-white/[0.04] px-3.5 py-1.5 rounded-xl border border-white/10">
-                <Calendar className="w-4 h-4 text-allstar-gold" />
+            <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-slate-600 dark:text-slate-300 pt-2">
+              <div className="flex items-center space-x-1.5 bg-white dark:bg-white/[0.04] px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm">
+                <Calendar className="w-4 h-4 text-amber-600 dark:text-allstar-gold" />
                 <span className="capitalize">{formattedDate}</span>
               </div>
 
-              <div className="flex items-center space-x-1.5 bg-white/[0.04] px-3.5 py-1.5 rounded-xl border border-white/10">
-                <Clock className="w-4 h-4 text-allstar-gold" />
+              <div className="flex items-center space-x-1.5 bg-white dark:bg-white/[0.04] px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm">
+                <Clock className="w-4 h-4 text-amber-600 dark:text-allstar-gold" />
                 <span>{formattedTime} HRS</span>
               </div>
 
-              <div className="flex items-center space-x-1.5 bg-white/[0.04] px-3.5 py-1.5 rounded-xl border border-white/10">
-                <MapPin className="w-4 h-4 text-allstar-gold" />
+              <div className="flex items-center space-x-1.5 bg-white dark:bg-white/[0.04] px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm">
+                <MapPin className="w-4 h-4 text-amber-600 dark:text-allstar-gold" />
                 <span>{event.venueName} • {event.city}</span>
               </div>
             </div>
@@ -237,26 +237,26 @@ export const LandingPage: React.FC = () => {
 
           {/* Guest Leaders Section */}
           {event.guestLeaders && event.guestLeaders.length > 0 && (
-            <div className="card-luxury rounded-3xl p-6 sm:p-8 border border-allstar-gold/25">
+            <div className="card-luxury rounded-3xl p-6 sm:p-8 border border-amber-500/25 dark:border-allstar-gold/25">
               <div className="text-center mb-6">
-                <span className="text-[11px] font-mono text-allstar-gold uppercase tracking-[0.2em] font-bold block mb-1">
+                <span className="text-[11px] font-mono text-amber-600 dark:text-allstar-gold uppercase tracking-[0.2em] font-bold block mb-1">
                   EXPOSITORES CONFIRMADOS
                 </span>
-                <h3 className="text-xl font-bold font-luxury text-white">Líderes de la Industria & Cruceros</h3>
+                <h3 className="text-xl font-bold font-luxury text-slate-900 dark:text-white">Líderes de la Industria & Cruceros</h3>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {event.guestLeaders.map((leader, i) => (
                   <div
                     key={i}
-                    className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 flex items-center space-x-3 hover:border-allstar-gold/40 transition-colors"
+                    className="p-4 rounded-2xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 flex items-center space-x-3 hover:border-amber-500/40 transition-colors"
                   >
-                    <div className="p-2.5 rounded-xl bg-allstar-gold/15 text-allstar-gold border border-allstar-gold/30">
+                    <div className="p-2.5 rounded-xl bg-amber-500/15 text-amber-700 dark:text-allstar-gold border border-amber-500/30">
                       <Award className="w-5 h-5" />
                     </div>
                     <div>
-                      <span className="text-sm font-bold text-white block">{leader}</span>
-                      <span className="text-[10px] text-slate-400 font-mono uppercase">Líder Invitado</span>
+                      <span className="text-sm font-bold text-slate-900 dark:text-white block">{leader}</span>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono uppercase">Líder Invitado</span>
                     </div>
                   </div>
                 ))}
@@ -265,29 +265,29 @@ export const LandingPage: React.FC = () => {
           )}
 
           {/* Registration Form Card */}
-          <div className="max-w-xl mx-auto card-luxury rounded-3xl p-6 sm:p-8 border border-allstar-gold/30 shadow-gold">
+          <div className="max-w-xl mx-auto card-luxury rounded-3xl p-6 sm:p-8 border border-amber-500/30 dark:border-allstar-gold/30 shadow-xl">
             <div className="text-center mb-6">
-              <span className="text-[11px] font-mono text-allstar-gold uppercase tracking-widest font-bold block mb-1">
+              <span className="text-[11px] font-mono text-amber-600 dark:text-allstar-gold uppercase tracking-widest font-bold block mb-1">
                 REGISTRO OFICIAL
               </span>
-              <h2 className="text-2xl font-bold font-luxury text-white">Asegura tu Pase de Abordaje</h2>
-              <p className="text-xs text-slate-400 mt-1">
+              <h2 className="text-2xl font-bold font-luxury text-slate-900 dark:text-white">Asegura tu Pase de Abordaje</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                 Ingreso con código QR digital intransferible en puerta.
               </p>
             </div>
 
             {stats?.isSoldOut ? (
               <div className="p-6 rounded-2xl bg-rose-500/20 border border-rose-500 text-center space-y-2">
-                <AlertCircle className="w-10 h-10 text-rose-400 mx-auto" />
-                <h3 className="text-lg font-bold text-white">Aforo Completo</h3>
-                <p className="text-xs text-slate-300">
+                <AlertCircle className="w-10 h-10 text-rose-500 mx-auto" />
+                <h3 className="text-lg font-bold text-rose-700 dark:text-white">Aforo Completo</h3>
+                <p className="text-xs text-slate-600 dark:text-slate-300">
                   Lo sentimos, se ha alcanzado la capacidad máxima de este evento.
                 </p>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
                 {formError && (
-                  <div className="p-3 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs flex items-center space-x-2">
+                  <div className="p-3 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-700 dark:text-rose-300 text-xs flex items-center space-x-2">
                     <AlertCircle className="w-4 h-4 shrink-0" />
                     <span>{formError}</span>
                   </div>
@@ -295,7 +295,7 @@ export const LandingPage: React.FC = () => {
 
                 {/* Attendee Name */}
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1.5 font-semibold">
+                  <label className="block text-xs font-mono uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5 font-semibold">
                     Nombre Completo *
                   </label>
                   <input
@@ -304,13 +304,13 @@ export const LandingPage: React.FC = () => {
                     value={attendeeName}
                     onChange={(e) => setAttendeeName(e.target.value)}
                     placeholder="Ej: Laura Sofía Daniels"
-                    className="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-allstar-gold transition-colors"
+                    className="w-full bg-slate-50 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-amber-500 dark:focus:border-allstar-gold transition-colors"
                   />
                 </div>
 
                 {/* Attendee Email */}
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1.5 font-semibold">
+                  <label className="block text-xs font-mono uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5 font-semibold">
                     Correo Electrónico *
                   </label>
                   <input
@@ -319,16 +319,16 @@ export const LandingPage: React.FC = () => {
                     value={attendeeEmail}
                     onChange={(e) => setAttendeeEmail(e.target.value)}
                     placeholder="laura@ejemplo.com"
-                    className="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-allstar-gold transition-colors"
+                    className="w-full bg-slate-50 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-amber-500 dark:focus:border-allstar-gold transition-colors"
                   />
-                  <p className="text-[11px] text-slate-400 mt-1">
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
                     Recibirás tu pase de abordaje y QR por correo transaccional.
                   </p>
                 </div>
 
                 {/* Attendee WhatsApp */}
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1.5 font-semibold">
+                  <label className="block text-xs font-mono uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5 font-semibold">
                     WhatsApp / Móvil (Recomendado)
                   </label>
                   <input
@@ -336,13 +336,13 @@ export const LandingPage: React.FC = () => {
                     value={attendeePhone}
                     onChange={(e) => setAttendeePhone(e.target.value)}
                     placeholder="+57 300 123 4567"
-                    className="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-allstar-gold transition-colors"
+                    className="w-full bg-slate-50 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-amber-500 dark:focus:border-allstar-gold transition-colors"
                   />
                 </div>
 
                 {/* Ticket Types Selector */}
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-2 font-semibold">
+                  <label className="block text-xs font-mono uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2 font-semibold">
                     Selecciona tu Tipo de Entrada *
                   </label>
                   <div className="space-y-2">
@@ -351,8 +351,8 @@ export const LandingPage: React.FC = () => {
                         key={type._id}
                         className={`flex items-center justify-between p-3.5 rounded-xl border cursor-pointer transition-all ${
                           selectedTicketTypeId === type._id
-                            ? 'bg-allstar-gold/15 border-allstar-gold shadow-gold text-white'
-                            : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:border-slate-700'
+                            ? 'bg-amber-50 border-amber-500 text-slate-900 dark:bg-allstar-gold/15 dark:border-allstar-gold dark:text-white shadow-sm'
+                            : 'bg-slate-50 border-slate-200 text-slate-700 dark:bg-slate-900/60 dark:border-slate-800 dark:text-slate-300 hover:border-amber-400'
                         }`}
                       >
                         <div className="flex items-center space-x-3">
@@ -362,18 +362,18 @@ export const LandingPage: React.FC = () => {
                             value={type._id}
                             checked={selectedTicketTypeId === type._id}
                             onChange={() => setSelectedTicketTypeId(type._id)}
-                            className="text-allstar-gold focus:ring-allstar-gold"
+                            className="text-amber-500 dark:text-allstar-gold focus:ring-amber-500"
                           />
                           <div>
                             <span className="font-semibold text-sm block">{type.name}</span>
-                            <span className="text-[11px] text-slate-400 block">
+                            <span className="text-[11px] text-slate-500 dark:text-slate-400 block">
                               Acceso al auditorio y validación rápida
                             </span>
                           </div>
                         </div>
 
                         <div className="text-right">
-                          <span className="font-bold text-sm text-allstar-gold font-mono">
+                          <span className="font-bold text-sm text-amber-700 dark:text-allstar-gold font-mono">
                             {type.price === 0 ? 'GRATIS' : `$${type.price} USD`}
                           </span>
                         </div>
@@ -387,7 +387,7 @@ export const LandingPage: React.FC = () => {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-4 rounded-xl bg-gradient-to-r from-allstar-gold via-amber-500 to-allstar-gold text-black font-extrabold text-base uppercase tracking-wider shadow-gold hover:opacity-95 active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center space-x-2"
+                    className="w-full py-4 rounded-xl bg-allstar-gradient text-black font-extrabold text-base uppercase tracking-wider shadow-gold hover:opacity-95 active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center space-x-2"
                   >
                     <Sparkles className="w-5 h-5 text-black" />
                     <span>

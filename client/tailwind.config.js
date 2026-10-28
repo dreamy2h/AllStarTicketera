@@ -1,24 +1,33 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
         allstar: {
-          dark: '#080d1a',
-          card: '#0f172a',
-          border: 'rgba(212, 175, 55, 0.25)',
+          dark: '#0a0a0d',
+          card: '#141418',
+          border: 'rgba(255, 170, 0, 0.25)',
+          // Paleta oficial All Star Team:
+          yellow: '#FFD700',       // Amarillo Vibrante
+          warm: '#FFAA00',         // Amarillo Cálido
+          orange: '#FF8800',       // Naranjo Enérgico
+          intense: '#FF5500',      // Naranjo Intenso
+          darkOrange: '#CC3300',   // Naranjo Oscuro
           gold: {
-            DEFAULT: '#d4af37',
-            light: '#f7e7a9',
-            dark: '#997300',
-            glow: 'rgba(212, 175, 55, 0.35)',
+            DEFAULT: '#FFAA00',
+            light: '#FFD700',
+            warm: '#FFAA00',
+            orange: '#FF8800',
+            dark: '#CC3300',
+            glow: 'rgba(255, 170, 0, 0.35)',
           },
           navy: {
-            900: '#060b17',
-            800: '#0c1529',
-            700: '#131e3a',
-            600: '#1b2a52',
+            900: '#09090b',
+            800: '#111114',
+            700: '#18181d',
+            600: '#222228',
           },
         },
       },
@@ -27,8 +36,9 @@ export default {
         mono: ['JetBrains Mono', 'Courier New', 'monospace'],
       },
       boxShadow: {
-        gold: '0 0 25px rgba(212, 175, 55, 0.25)',
-        'gold-lg': '0 0 45px rgba(212, 175, 55, 0.4)',
+        gold: '0 0 25px rgba(255, 170, 0, 0.3)',
+        'gold-lg': '0 0 45px rgba(255, 136, 0, 0.45)',
+        orange: '0 0 30px rgba(255, 85, 0, 0.35)',
       },
     },
   },

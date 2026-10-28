@@ -33,9 +33,11 @@ import { RoleManagement } from '../components/RoleManagement.js';
 import { CreateEventModal } from '../components/CreateEventModal.js';
 import { Can } from '../components/Can.js';
 import { useAuth } from '../context/AuthContext.js';
+import { useTheme } from '../context/ThemeContext.js';
 
 export const AdminPage: React.FC = () => {
   const { user: currentUser } = useAuth();
+  const { logoSrc } = useTheme();
 
   const [activeTab, setActiveTab] = useState<'metrics' | 'partners' | 'roles' | 'my_invites'>('metrics');
   const [events, setEvents] = useState<EventItem[]>([]);
@@ -137,9 +139,11 @@ export const AdminPage: React.FC = () => {
   if (!currentUser) {
     return (
       <div className="min-h-[80vh] flex flex-col items-center justify-center text-center px-4 max-w-lg mx-auto py-12">
-        <div className="w-16 h-16 rounded-3xl bg-allstar-gold/20 border-2 border-allstar-gold/40 flex items-center justify-center text-allstar-gold mb-6 shadow-gold">
-          <Lock className="w-8 h-8" />
-        </div>
+        <img
+          src="/images/allstar-team-logo.png"
+          alt="All Star Team"
+          className="h-16 sm:h-20 w-auto mx-auto object-contain mb-5 filter drop-shadow-[0_0_25px_rgba(255,170,0,0.4)]"
+        />
         <h1 className="text-3xl font-extrabold font-luxury text-white mb-3">
           Acceso Privado para Socios
         </h1>
@@ -148,7 +152,7 @@ export const AdminPage: React.FC = () => {
         </p>
         <Link
           to="/login"
-          className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-allstar-gold to-amber-600 text-black font-extrabold text-sm uppercase tracking-wider shadow-gold hover:opacity-95 transition-all"
+          className="px-8 py-3.5 rounded-xl bg-allstar-gradient text-black font-extrabold text-sm uppercase tracking-wider shadow-gold hover:opacity-95 transition-all"
         >
           Iniciar Sesión
         </Link>
@@ -158,20 +162,27 @@ export const AdminPage: React.FC = () => {
 
   return (
     <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8">
-      {/* Top Header Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-allstar-gold/20">
-        <div>
-          <div className="flex items-center space-x-2">
-            <span className="text-xs font-mono text-allstar-gold uppercase tracking-widest font-bold">
-              PLATAFORMA PRIVADA • {currentUser.roleName || currentUser.role}
-            </span>
+      {/* Top Header Bar with All Star Team branding */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-200 dark:border-allstar-gold/20">
+        <div className="flex items-center space-x-4">
+          <img
+            src={logoSrc}
+            alt="All Star Team"
+            className="h-11 sm:h-12 w-auto object-contain filter drop-shadow-[0_0_15px_rgba(255,170,0,0.35)] shrink-0 hidden sm:block"
+          />
+          <div>
+            <div className="flex items-center space-x-2">
+              <span className="text-xs font-mono text-amber-600 dark:text-allstar-gold uppercase tracking-widest font-bold">
+                PLATAFORMA PRIVADA • {currentUser.roleName || currentUser.role}
+              </span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold font-luxury text-slate-900 dark:text-white">
+              Panel de Control & Organización
+            </h1>
+            <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+              Hola <strong className="text-slate-900 dark:text-white">{currentUser.fullName}</strong> (@{currentUser.referralCode}). Monitorea tus invitados y administra tu equipo.
+            </p>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold font-luxury text-white">
-            Panel de Control & Organización
-          </h1>
-          <p className="text-xs text-slate-400 mt-1">
-            Hola <strong className="text-white">{currentUser.fullName}</strong> (@{currentUser.referralCode}). Monitorea tus invitados y administra tu equipo.
-          </p>
         </div>
 
         {/* Global Action Controls with Declarative <Can> guards */}
@@ -201,7 +212,7 @@ export const AdminPage: React.FC = () => {
           {/* Emit Manual Ticket Button: Available for all partners */}
           <button
             onClick={() => setShowManualModal(true)}
-            className="flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-allstar-gold to-amber-600 text-black font-bold text-xs uppercase tracking-wider shadow-gold hover:opacity-95 active:scale-95 transition-all"
+            className="flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-allstar-gradient text-black font-extrabold text-xs uppercase tracking-wider shadow-gold hover:opacity-95 active:scale-95 transition-all"
           >
             <UserPlus className="w-4 h-4" />
             <span>Emitir Pase a Invitado</span>
@@ -211,23 +222,23 @@ export const AdminPage: React.FC = () => {
           <button
             onClick={handleRefresh}
             disabled={isRefreshing}
-            className="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 transition-colors disabled:opacity-50"
+            className="p-2.5 rounded-xl bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-700 dark:text-slate-200 shadow-sm transition-colors disabled:opacity-50"
             title="Refrescar métricas en vivo"
           >
-            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-allstar-gold' : ''}`} />
+            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-amber-600 dark:text-allstar-gold' : ''}`} />
           </button>
         </div>
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-white/10 pb-2">
+      <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 dark:border-white/10 pb-2">
         <Can do="metrics:view">
           <button
             onClick={() => setActiveTab('metrics')}
             className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
               activeTab === 'metrics'
-                ? 'bg-allstar-gold text-black shadow-gold'
-                : 'text-slate-300 hover:bg-white/5'
+                ? 'bg-allstar-gradient text-black shadow-gold font-extrabold'
+                : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/5'
             }`}
           >
             <BarChart3 className="w-4 h-4" />
@@ -241,8 +252,8 @@ export const AdminPage: React.FC = () => {
             onClick={() => setActiveTab('partners')}
             className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
               activeTab === 'partners'
-                ? 'bg-allstar-gold text-black shadow-gold'
-                : 'text-slate-300 hover:bg-white/5'
+                ? 'bg-allstar-gradient text-black shadow-gold font-extrabold'
+                : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/5'
             }`}
           >
             <Users className="w-4 h-4" />
@@ -256,13 +267,13 @@ export const AdminPage: React.FC = () => {
             onClick={() => setActiveTab('roles')}
             className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
               activeTab === 'roles'
-                ? 'bg-allstar-gold text-black shadow-gold'
-                : 'text-slate-300 hover:bg-white/5'
+                ? 'bg-allstar-gradient text-black shadow-gold font-extrabold'
+                : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/5'
             }`}
           >
             <ShieldCheck className="w-4 h-4" />
             <span>Roles & Permisos (RBAC)</span>
-            <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-950 text-amber-300 border border-amber-600/40 font-mono">
+            <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-600/40 font-mono">
               MongoDB
             </span>
           </button>
@@ -273,8 +284,8 @@ export const AdminPage: React.FC = () => {
           onClick={() => setActiveTab('my_invites')}
           className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
             activeTab === 'my_invites'
-              ? 'bg-allstar-gold text-black shadow-gold'
-              : 'text-slate-300 hover:bg-white/5'
+              ? 'bg-allstar-gradient text-black shadow-gold font-extrabold'
+              : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/5'
           }`}
         >
           <UserCheck className="w-4 h-4" />
@@ -286,14 +297,14 @@ export const AdminPage: React.FC = () => {
       {activeTab === 'metrics' && (
         <div className="space-y-8">
           {activeEvent && (
-            <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/10 flex flex-wrap items-center justify-between gap-4">
+            <div className="p-4 rounded-2xl bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-white/10 shadow-sm flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center space-x-3">
-                <div className="p-2.5 rounded-xl bg-allstar-gold/15 text-allstar-gold border border-allstar-gold/30">
+                <div className="p-2.5 rounded-xl bg-amber-500/15 text-amber-700 dark:text-allstar-gold border border-amber-500/30">
                   <Calendar className="w-5 h-5" />
                 </div>
                 <div>
-                  <span className="text-xs text-slate-400 font-mono uppercase block">Evento Seleccionado:</span>
-                  <span className="text-base font-bold text-white">{activeEvent.title}</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400 font-mono uppercase block">Evento Seleccionado:</span>
+                  <span className="text-base font-bold text-slate-900 dark:text-white">{activeEvent.title}</span>
                 </div>
               </div>
 
@@ -302,7 +313,7 @@ export const AdminPage: React.FC = () => {
                   <select
                     value={selectedEventId}
                     onChange={(e) => setSelectedEventId(e.target.value)}
-                    className="bg-slate-900 border border-slate-700 text-xs text-white rounded-xl px-3 py-1.5 focus:outline-none focus:border-allstar-gold"
+                    className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs text-slate-800 dark:text-white rounded-xl px-3 py-1.5 focus:outline-none focus:border-amber-500"
                   >
                     {events.map((e) => (
                       <option key={e._id} value={e._id}>
@@ -315,7 +326,7 @@ export const AdminPage: React.FC = () => {
                   href={`/eventos/${activeEvent.slug}?ref=${currentUser.referralCode}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-allstar-gold hover:underline font-bold"
+                  className="text-amber-600 dark:text-allstar-gold hover:underline font-bold"
                 >
                   Mi Enlace Personal ↗
                 </a>

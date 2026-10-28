@@ -22,9 +22,11 @@ export const ScannerPage: React.FC = () => {
   if (!user) {
     return (
       <div className="min-h-[75vh] flex flex-col items-center justify-center text-center px-4 max-w-md mx-auto py-12">
-        <div className="w-16 h-16 rounded-3xl bg-emerald-500/10 border-2 border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-6 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
-          <Lock className="w-8 h-8" />
-        </div>
+        <img
+          src="/images/allstar-team-logo.png"
+          alt="All Star Team"
+          className="h-16 sm:h-20 w-auto mx-auto object-contain mb-5 filter drop-shadow-[0_0_25px_rgba(255,170,0,0.4)]"
+        />
         <span className="text-xs font-mono uppercase tracking-widest text-emerald-400 font-bold mb-2">
           Terminal de Puerta Protegida
         </span>
@@ -36,7 +38,7 @@ export const ScannerPage: React.FC = () => {
         </p>
         <Link
           to="/login"
-          className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-allstar-gold to-amber-600 text-black font-extrabold text-xs uppercase tracking-wider shadow-gold hover:opacity-95 transition-all"
+          className="px-8 py-3.5 rounded-xl bg-allstar-gradient text-black font-extrabold text-xs uppercase tracking-wider shadow-gold hover:opacity-95 transition-all"
         >
           Iniciar Sesión de Socio
         </Link>
@@ -92,6 +94,14 @@ export const ScannerPage: React.FC = () => {
             <User className="w-3 h-3 text-allstar-gold" />
             <span>Operador: <strong className="text-white">{user.fullName.split(' ')[0]}</strong></span>
           </div>
+        </div>
+
+        <div className="flex justify-center mb-3">
+          <img
+            src="/images/allstar-team-logo.png"
+            alt="All Star Team"
+            className="h-10 sm:h-12 w-auto object-contain filter drop-shadow-[0_0_15px_rgba(255,170,0,0.35)]"
+          />
         </div>
 
         <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-bold uppercase tracking-wider mb-2">
