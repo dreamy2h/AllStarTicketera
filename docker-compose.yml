@@ -39,6 +39,12 @@ services:
       - JWT_SECRET=${JWT_SECRET:-allstar_super_secret_jwt_key_2026}
       - RESEND_API_KEY=${RESEND_API_KEY:-}
       - RESEND_FROM_EMAIL=${RESEND_FROM_EMAIL:-AllStar Tickets <onboarding@resend.dev>}
+      - SMTP_HOST=${SMTP_HOST:-}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_USER=${SMTP_USER:-}
+      - SMTP_PASS=${SMTP_PASS:-}
+      - SMTP_SECURE=${SMTP_SECURE:-false}
+      - SMTP_FROM=${SMTP_FROM:-}
     depends_on:
       mongo:
         condition: service_healthy

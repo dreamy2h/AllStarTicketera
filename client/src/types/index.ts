@@ -39,6 +39,8 @@ export interface User {
   };
 }
 
+export type EventStatus = 'active' | 'cancelled' | 'completed';
+
 export interface EventItem {
   _id: string;
   title: string;
@@ -50,6 +52,9 @@ export interface EventItem {
   guestLeaders: string[];
   capacityLimit?: number | null;
   isActive: boolean;
+  status?: EventStatus;
+  cancellationReason?: string | null;
+  cancelledAt?: string | null;
   createdAt?: string;
 }
 
@@ -59,6 +64,30 @@ export interface TicketTypeItem {
   name: string;
   price: number;
   maxQuantity?: number | null;
+  description?: string;
+  isActive?: boolean;
+  ticketsSold?: number;
+  ticketsCheckedIn?: number;
+  availableQuantity?: number | null;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateTicketTypePayload {
+  eventId: string;
+  name: string;
+  price: number;
+  maxQuantity?: number | null;
+  description?: string;
+  isActive?: boolean;
+}
+
+export interface UpdateTicketTypePayload {
+  name?: string;
+  price?: number;
+  maxQuantity?: number | null;
+  description?: string;
+  isActive?: boolean;
 }
 
 export type TicketStatus = 'registered' | 'checked_in' | 'cancelled';

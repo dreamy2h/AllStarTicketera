@@ -33,7 +33,7 @@ export const TicketViewPage: React.FC = () => {
     return (
       <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4">
         <RefreshCw className="w-10 h-10 text-allstar-gold animate-spin mb-4" />
-        <h2 className="text-xl font-bold font-luxury text-white">Cargando Pase de Abordaje...</h2>
+        <h2 className="text-xl font-bold font-luxury text-slate-900 dark:text-white">Cargando Pase de Abordaje...</h2>
       </div>
     );
   }
@@ -42,9 +42,9 @@ export const TicketViewPage: React.FC = () => {
     return (
       <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4 max-w-md mx-auto">
         <AlertCircle className="w-16 h-16 text-rose-500 mb-4" />
-        <h2 className="text-2xl font-bold font-luxury text-white mb-2">Pase No Encontrado</h2>
-        <p className="text-slate-400 text-sm mb-6">
-          El código <span className="font-mono text-allstar-gold">{ticketCode}</span> no corresponde a un ticket activo.
+        <h2 className="text-2xl font-bold font-luxury text-slate-900 dark:text-white mb-2">Pase No Encontrado</h2>
+        <p className="text-slate-600 dark:text-slate-400 text-sm mb-6">
+          El código <span className="font-mono text-amber-600 dark:text-allstar-gold">{ticketCode}</span> no corresponde a un ticket activo.
         </p>
         <Link
           to="/"
@@ -63,10 +63,10 @@ export const TicketViewPage: React.FC = () => {
           <Sparkles className="w-3.5 h-3.5" />
           <span>Acceso Confirmado</span>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold font-luxury text-white">
+        <h1 className="text-2xl sm:text-3xl font-extrabold font-luxury text-slate-900 dark:text-white">
           Pase de Abordaje Digital
         </h1>
-        <p className="text-xs text-slate-400">
+        <p className="text-xs text-slate-600 dark:text-slate-400">
           Presenta este código en la puerta de acceso para validar tu ingreso.
         </p>
       </div>

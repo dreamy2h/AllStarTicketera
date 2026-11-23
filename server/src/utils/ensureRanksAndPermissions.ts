@@ -96,7 +96,7 @@ export const initialRanks = [
 
 export const ensureRanksAndPermissions = async (): Promise<void> => {
   try {
-    // 1. Ensure permission 'ranks:manage' exists
+    // 1. Ensure permission 'ranks:manage' and 'ticket_types:manage' exist
     let ranksPerm = await Permission.findOne({ code: 'ranks:manage' });
     if (!ranksPerm) {
       ranksPerm = await Permission.create({
@@ -108,17 +108,36 @@ export const ensureRanksAndPermissions = async (): Promise<void> => {
       console.log('✅ Permiso "ranks:manage" creado en la base de datos.');
     }
 
-    // 2. Ensure admin role has 'ranks:manage' permission
+    let ticketTypesPerm = await Permission.findOne({ code: 'ticket_types:manage' });
+    if (!ticketTypesPerm) {
+      ticketTypesPerm = await Permission.create({
+        code: 'ticket_types:manage',
+        name: 'Gestionar Tipos de Entrada',
+        category: 'Eventos',
+        description: 'Permite crear, editar, fijar precios y cupos de los tipos de tickets para eventos.',
+      });
+      console.log('✅ Permiso "ticket_types:manage" creado en la base de datos.');
+    }
+
+    // 2. Ensure admin role has permissions
     const adminRoles = await Role.find({
       $or: [{ slug: 'admin' }, { isSystem: true, name: /admin/i }],
     });
 
     for (const role of adminRoles) {
       const permIds = (role.permissions || []).map((p: any) => p.toString());
+      let modified = false;
       if (!permIds.includes(ranksPerm._id.toString())) {
         role.permissions.push(ranksPerm._id as any);
+        modified = true;
+      }
+      if (ticketTypesPerm && !permIds.includes(ticketTypesPerm._id.toString())) {
+        role.permissions.push(ticketTypesPerm._id as any);
+        modified = true;
+      }
+      if (modified) {
         await role.save();
-        console.log(`✅ Permiso "ranks:manage" asociado al rol ${role.name}.`);
+        console.log(`✅ Permisos actualizados en rol ${role.name}.`);
       }
     }
 

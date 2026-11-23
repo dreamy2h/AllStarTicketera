@@ -12,9 +12,13 @@ import {
   Compass,
   Copy,
   ExternalLink,
+  Mail,
+  Loader2,
+  AlertTriangle,
 } from 'lucide-react';
 import { TicketItem } from '../types/index.js';
-import { generateWhatsAppTicketLink } from '../services/whatsapp.js';
+import { generateWhatsAppTicketLink, shareTicketWithQRImage } from '../services/whatsapp.js';
+import { api } from '../services/api.js';
 
 interface BoardingPassProps {
   ticket: TicketItem;
@@ -24,12 +28,18 @@ interface BoardingPassProps {
 export const BoardingPass: React.FC<BoardingPassProps> = ({ ticket, showActions = true }) => {
   const passRef = useRef<HTMLDivElement>(null);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isSharingWhatsapp, setIsSharingWhatsapp] = useState(false);
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const [shareNotice, setShareNotice] = useState<string | null>(null);
+  const [emailPreviewUrl, setEmailPreviewUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
   // Cast populated fields
   const event = typeof ticket.eventId === 'object' ? ticket.eventId : null;
   const ticketType = typeof ticket.ticketTypeId === 'object' ? ticket.ticketTypeId : null;
   const referrer = typeof ticket.invitedByUserId === 'object' && ticket.invitedByUserId ? ticket.invitedByUserId : null;
+
+  const isCancelled = event?.status === 'cancelled';
 
   const eventDate = event?.eventDate ? new Date(event.eventDate) : new Date();
   const dateFormatted = eventDate.toLocaleDateString('es-ES', {
@@ -51,7 +61,6 @@ export const BoardingPass: React.FC<BoardingPassProps> = ({ ticket, showActions 
     if (!passRef.current) return;
     try {
       setIsDownloading(true);
-      // Wait for all fonts and QR to settle
       await new Promise((resolve) => setTimeout(resolve, 200));
 
       const dataUrl = await toPng(passRef.current, {
@@ -78,14 +87,68 @@ export const BoardingPass: React.FC<BoardingPassProps> = ({ ticket, showActions 
     setTimeout(() => setCopied(false), 2500);
   };
 
-  const whatsappLink = generateWhatsAppTicketLink({
-    phone: ticket.attendeePhone,
-    attendeeName: ticket.attendeeName,
-    eventName: event?.title || 'Cumbre All-Star',
-    ticketCode: ticket.ticketCode,
-    ticketViewUrl: ticketUrl,
-    referrerName: referrer?.fullName,
-  });
+  const handleShareWhatsApp = async () => {
+    try {
+      setIsSharingWhatsapp(true);
+      setShareNotice(null);
+
+      let imageBlob: Blob | null = null;
+      if (passRef.current) {
+        try {
+          const dataUrl = await toPng(passRef.current, {
+            pixelRatio: 2,
+            backgroundColor: '#09090b',
+          });
+          const res = await fetch(dataUrl);
+          imageBlob = await res.blob();
+        } catch (imgErr) {
+          console.warn('No se pudo generar el blob de imagen completo:', imgErr);
+        }
+      }
+
+      const res = await shareTicketWithQRImage(
+        {
+          phone: ticket.attendeePhone,
+          attendeeName: ticket.attendeeName,
+          eventName: event?.title || 'Cumbre All-Star',
+          ticketCode: ticket.ticketCode,
+          ticketViewUrl: ticketUrl,
+          referrerName: referrer?.fullName,
+        },
+        imageBlob
+      );
+
+      if (res.message) {
+        setShareNotice(res.message);
+        setTimeout(() => setShareNotice(null), 6000);
+      }
+    } catch (err) {
+      console.error('Error al compartir por WhatsApp:', err);
+    } finally {
+      setIsSharingWhatsapp(false);
+    }
+  };
+
+  const handleSendEmail = async () => {
+    try {
+      setIsSendingEmail(true);
+      setShareNotice(null);
+      setEmailPreviewUrl(null);
+      const res = await api.sendTicketEmail(ticket.ticketCode);
+      if (res.previewUrl) {
+        setEmailPreviewUrl(res.previewUrl);
+        setShareNotice(`✉️ Invitación generada para ${ticket.attendeeEmail}`);
+      } else {
+        setShareNotice(`✉️ ${res.message || `Invitación enviada a ${ticket.attendeeEmail}`}`);
+      }
+      setTimeout(() => setShareNotice(null), 8000);
+    } catch (err: any) {
+      setShareNotice(`⚠️ ${err.message || 'Error al enviar invitación por correo'}`);
+      setTimeout(() => setShareNotice(null), 6000);
+    } finally {
+      setIsSendingEmail(false);
+    }
+  };
 
   return (
     <div className="flex flex-col items-center w-full max-w-3xl mx-auto">
@@ -98,6 +161,14 @@ export const BoardingPass: React.FC<BoardingPassProps> = ({ ticket, showActions 
             'radial-gradient(circle at 85% 15%, rgba(255, 170, 0, 0.12) 0%, transparent 60%), radial-gradient(circle at 10% 85%, rgba(255, 85, 0, 0.08) 0%, transparent 50%)',
         }}
       >
+        {/* Cancellation Notice if event cancelled */}
+        {isCancelled && (
+          <div className="bg-rose-600 text-white px-4 py-2 text-center text-xs font-bold uppercase tracking-wider flex items-center justify-center space-x-2">
+            <AlertTriangle className="w-4 h-4 shrink-0" />
+            <span>Este evento ha sido cancelado por la organización</span>
+          </div>
+        )}
+
         {/* Pass Header Banner with Official All Star Team Logo */}
         <div className="bg-gradient-to-r from-[#141419] via-[#1c1c24] to-[#141419] px-6 py-4 border-b border-allstar-gold/30 flex items-center justify-between flex-wrap gap-3">
           <div className="flex items-center space-x-3">
@@ -189,12 +260,18 @@ export const BoardingPass: React.FC<BoardingPassProps> = ({ ticket, showActions 
                 </span>
                 <span
                   className={`text-xs font-mono font-bold uppercase inline-block px-2 py-0.5 rounded ${
-                    ticket.status === 'checked_in'
+                    isCancelled || ticket.status === 'cancelled'
+                      ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                      : ticket.status === 'checked_in'
                       ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
                       : 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
                   }`}
                 >
-                  {ticket.status === 'checked_in' ? 'Check-in Realizado' : 'Confirmado'}
+                  {isCancelled || ticket.status === 'cancelled'
+                    ? 'Cancelado'
+                    : ticket.status === 'checked_in'
+                    ? 'Check-in Realizado'
+                    : 'Confirmado'}
                 </span>
               </div>
             </div>
@@ -270,37 +347,73 @@ export const BoardingPass: React.FC<BoardingPassProps> = ({ ticket, showActions 
         </div>
       </div>
 
+      {/* Share / Action Notification Banner */}
+      {shareNotice && (
+        <div className="w-full mt-4 p-3.5 rounded-xl bg-amber-500/15 border border-amber-500/40 text-slate-800 dark:text-amber-200 text-xs font-semibold flex items-center justify-between gap-2 shadow-sm animate-in fade-in duration-200">
+          <div className="flex items-center space-x-2 flex-wrap gap-1">
+            <span>{shareNotice}</span>
+            {emailPreviewUrl && (
+              <a
+                href={emailPreviewUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="underline text-sky-600 dark:text-sky-300 font-bold ml-1 hover:opacity-80"
+              >
+                Ver correo en el navegador ↗
+              </a>
+            )}
+          </div>
+          <button
+            onClick={() => { setShareNotice(null); setEmailPreviewUrl(null); }}
+            className="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white text-xs font-bold px-2 py-0.5 rounded ml-2"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       {/* Action Buttons */}
       {showActions && (
-        <div className="w-full mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="w-full mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {/* Download Image Button */}
           <button
             onClick={handleDownloadImage}
             disabled={isDownloading}
-            className="flex items-center justify-center space-x-2 py-3 px-4 rounded-xl bg-allstar-gradient text-black font-extrabold text-sm shadow-gold hover:opacity-95 active:scale-95 transition-all disabled:opacity-50"
+            className="flex items-center justify-center space-x-2 py-3 px-3 rounded-xl bg-allstar-gradient text-black font-extrabold text-xs uppercase tracking-wider shadow-gold hover:opacity-95 active:scale-95 transition-all disabled:opacity-50"
           >
-            <Download className="w-4 h-4" />
-            <span>{isDownloading ? 'Generando Pase...' : 'Descargar Pase (HD)'}</span>
+            {isDownloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+            <span>{isDownloading ? 'Generando...' : 'Descargar Pase'}</span>
           </button>
 
-          {/* WhatsApp Button */}
-          <a
-            href={whatsappLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center space-x-2 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-lg hover:shadow-emerald-500/25 active:scale-95 transition-all"
+          {/* WhatsApp Button with QR Image */}
+          <button
+            onClick={handleShareWhatsApp}
+            disabled={isSharingWhatsapp}
+            className="flex items-center justify-center space-x-2 py-3 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider shadow-lg hover:shadow-emerald-500/25 active:scale-95 transition-all disabled:opacity-50"
+            title="Compartir por WhatsApp con imagen del código QR"
           >
-            <Share2 className="w-4 h-4" />
-            <span>Enviar por WhatsApp</span>
-          </a>
+            {isSharingWhatsapp ? <Loader2 className="w-4 h-4 animate-spin" /> : <Share2 className="w-4 h-4" />}
+            <span>{isSharingWhatsapp ? 'Preparando...' : 'WhatsApp + QR'}</span>
+          </button>
+
+          {/* Send Invitation by Email Button */}
+          <button
+            onClick={handleSendEmail}
+            disabled={isSendingEmail}
+            className="flex items-center justify-center space-x-2 py-3 px-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs uppercase tracking-wider shadow-md active:scale-95 transition-all disabled:opacity-50"
+            title="Enviar invitación con código QR al correo del asistente"
+          >
+            {isSendingEmail ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
+            <span>{isSendingEmail ? 'Enviando...' : 'Enviar por Correo'}</span>
+          </button>
 
           {/* Copy Link Button */}
           <button
             onClick={handleCopyLink}
-            className="flex items-center justify-center space-x-2 py-3 px-4 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 font-semibold text-sm shadow-sm active:scale-95 transition-all"
+            className="flex items-center justify-center space-x-2 py-3 px-3 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 font-semibold text-xs uppercase tracking-wider shadow-sm active:scale-95 transition-all"
           >
             {copied ? <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" /> : <Copy className="w-4 h-4" />}
-            <span>{copied ? '¡Enlace Copiado!' : 'Copiar Enlace'}</span>
+            <span>{copied ? '¡Copiado!' : 'Copiar Enlace'}</span>
           </button>
         </div>
       )}

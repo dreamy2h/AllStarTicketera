@@ -5,13 +5,110 @@ import { User } from '../models/User.js';
 import { Ticket } from '../models/Ticket.js';
 import { generateAttendeesCsv } from '../services/csvService.js';
 
-export const getAllEvents = async (_req: Request, res: Response): Promise<void> => {
+export const getAllEvents = async (req: Request, res: Response): Promise<void> => {
   try {
-    const events = await Event.find({ isActive: true }).sort({ eventDate: 1 });
-    res.json({ success: true, events });
+    const { type, status } = req.query;
+    const now = new Date();
+
+    let query: any = {};
+    if (status && typeof status === 'string' && status !== 'all') {
+      query.status = status;
+    }
+
+    const allEvents = await Event.find(query).sort({ eventDate: 1 });
+
+    const upcoming = allEvents.filter(
+      (e) => new Date(e.eventDate) >= now && e.status !== 'cancelled' && e.isActive !== false
+    );
+
+    const past = allEvents.filter(
+      (e) => (new Date(e.eventDate) < now || e.status === 'completed') && e.status !== 'cancelled'
+    );
+
+    const cancelled = allEvents.filter((e) => e.status === 'cancelled');
+
+    let eventsToReturn = allEvents;
+    if (type === 'upcoming') {
+      eventsToReturn = upcoming;
+    } else if (type === 'past' || type === 'history') {
+      eventsToReturn = past;
+    } else if (type === 'cancelled') {
+      eventsToReturn = cancelled;
+    }
+
+    res.json({
+      success: true,
+      events: eventsToReturn,
+      upcoming,
+      past,
+      cancelled,
+      counts: {
+        total: allEvents.length,
+        upcoming: upcoming.length,
+        past: past.length,
+        cancelled: cancelled.length,
+      },
+    });
   } catch (error) {
     console.error('Error al obtener eventos:', error);
     res.status(500).json({ success: false, message: 'Error interno del servidor' });
+  }
+};
+
+export const cancelEvent = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+
+    const event = await Event.findById(id);
+    if (!event) {
+      res.status(404).json({ success: false, message: 'Evento no encontrado' });
+      return;
+    }
+
+    event.status = 'cancelled';
+    event.isActive = false;
+    event.cancellationReason = reason || 'Cancelado por el organizador';
+    event.cancelledAt = new Date();
+
+    await event.save();
+
+    res.json({
+      success: true,
+      message: `El evento "${event.title}" ha sido cancelado exitosamente.`,
+      event,
+    });
+  } catch (error: any) {
+    console.error('Error al cancelar evento:', error);
+    res.status(500).json({ success: false, message: error.message || 'Error al cancelar evento' });
+  }
+};
+
+export const reactivateEvent = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+
+    const event = await Event.findById(id);
+    if (!event) {
+      res.status(404).json({ success: false, message: 'Evento no encontrado' });
+      return;
+    }
+
+    event.status = 'active';
+    event.isActive = true;
+    event.cancellationReason = null;
+    event.cancelledAt = null;
+
+    await event.save();
+
+    res.json({
+      success: true,
+      message: `El evento "${event.title}" ha sido reactivado exitosamente.`,
+      event,
+    });
+  } catch (error: any) {
+    console.error('Error al reactivar evento:', error);
+    res.status(500).json({ success: false, message: error.message || 'Error al reactivar evento' });
   }
 };
 

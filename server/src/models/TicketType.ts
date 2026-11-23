@@ -5,6 +5,8 @@ export interface ITicketType extends Document {
   name: string;
   price: number;
   maxQuantity?: number | null;
+  description?: string;
+  isActive?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -30,6 +32,15 @@ const TicketTypeSchema = new Schema<ITicketType>(
     maxQuantity: {
       type: Number,
       default: null,
+    },
+    description: {
+      type: String,
+      default: '',
+      trim: true,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
     },
   },
   {

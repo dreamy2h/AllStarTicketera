@@ -1,4 +1,6 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
+import QRCode from 'qrcode';
 import { Ticket } from '../models/Ticket.js';
 import { Event } from '../models/Event.js';
 import { TicketType } from '../models/TicketType.js';
@@ -45,8 +47,13 @@ export const registerTicket = async (req: Request, res: Response): Promise<void>
     }
 
     const event = await Event.findById(eventId);
-    if (!event || !event.isActive) {
-      res.status(404).json({ success: false, message: 'El evento no existe o no se encuentra activo' });
+    if (!event || !event.isActive || event.status === 'cancelled') {
+      res.status(400).json({
+        success: false,
+        message: event?.status === 'cancelled'
+          ? 'Este evento ha sido cancelado y no admite nuevas inscripciones.'
+          : 'El evento no existe o no se encuentra activo',
+      });
       return;
     }
 
@@ -179,6 +186,16 @@ export const checkInTicket = async (req: Request, res: Response): Promise<void> 
       return;
     }
 
+    const event = ticket.eventId as any;
+    if (event && (event.status === 'cancelled' || event.isActive === false)) {
+      res.status(400).json({
+        success: false,
+        message: `El evento "${event.title || 'Asociado'}" ha sido CANCELADO. El acceso no está permitido.`,
+        ticket,
+      });
+      return;
+    }
+
     if (ticket.status === 'checked_in') {
       const checkInFormatted = ticket.checkedInAt
         ? new Date(ticket.checkedInAt).toLocaleTimeString('es-ES', {
@@ -273,5 +290,82 @@ export const getEventAttendees = async (req: Request, res: Response): Promise<vo
   } catch (error) {
     console.error('Error al listar asistentes:', error);
     res.status(500).json({ success: false, message: 'Error interno del servidor' });
+  }
+};
+
+export const resendTicketEmail = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+
+    const query = mongoose.isValidObjectId(id) ? { _id: id } : { ticketCode: id.trim().toUpperCase() };
+    const ticket = await Ticket.findOne(query)
+      .populate('eventId')
+      .populate('ticketTypeId')
+      .populate('invitedByUserId', 'fullName referralCode');
+
+    if (!ticket) {
+      res.status(404).json({ success: false, message: 'Ticket no encontrado' });
+      return;
+    }
+
+    const event = ticket.eventId as any;
+    const ticketType = ticket.ticketTypeId as any;
+    const referrer = ticket.invitedByUserId as any;
+
+    const clientUrl = process.env.CLIENT_URL || 'http://localhost:3000';
+    const ticketViewUrl = `${clientUrl}/ticket/${ticket.ticketCode}`;
+
+    const result = await sendTicketConfirmationEmail({
+      toEmail: (req.body && req.body.email) || ticket.attendeeEmail,
+      attendeeName: ticket.attendeeName,
+      eventName: event ? event.title : 'Cumbre All-Star',
+      eventDate: event ? event.eventDate : new Date(),
+      venueName: event ? event.venueName : 'Recinto Oficial',
+      city: event ? event.city : 'Sede Oficial',
+      ticketCode: ticket.ticketCode,
+      ticketTypeName: ticketType ? ticketType.name : 'Pase General',
+      referrerName: referrer ? referrer.fullName : undefined,
+      ticketViewUrl,
+    });
+
+    res.json({
+      success: result.success,
+      sent: result.sent,
+      previewUrl: result.previewUrl,
+      message: result.message,
+    });
+  } catch (error: any) {
+    console.error('Error enviando email de invitación:', error);
+    res.status(500).json({ success: false, message: error.message || 'Error al enviar email de invitación' });
+  }
+};
+
+export const getTicketQrImage = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { code } = req.params;
+    const cleanCode = code.replace(/\.png$/i, '').trim().toUpperCase();
+
+    const ticket = await Ticket.findOne({ ticketCode: cleanCode });
+    if (!ticket) {
+      res.status(404).json({ success: false, message: 'Ticket no encontrado' });
+      return;
+    }
+
+    const qrBuffer = await QRCode.toBuffer(cleanCode, {
+      width: 400,
+      margin: 2,
+      color: {
+        dark: '#0b1329',
+        light: '#ffffff',
+      },
+    });
+
+    res.setHeader('Content-Type', 'image/png');
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    res.setHeader('Content-Disposition', `inline; filename="qr-${cleanCode}.png"`);
+    res.send(qrBuffer);
+  } catch (error: any) {
+    console.error('Error generando QR image:', error);
+    res.status(500).json({ success: false, message: 'Error generando imagen QR' });
   }
 };

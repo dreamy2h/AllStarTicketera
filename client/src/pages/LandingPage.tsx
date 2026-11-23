@@ -183,6 +183,23 @@ export const LandingPage: React.FC = () => {
       ) : (
         /* Event Hero + Registration Form */
         <div className="space-y-10">
+          {/* Cancellation Alert Banner */}
+          {event.status === 'cancelled' && (
+            <div className="p-4 sm:p-5 rounded-2xl bg-rose-500/15 border-2 border-rose-500/50 flex items-start sm:items-center space-x-3 text-rose-800 dark:text-rose-300 shadow-md">
+              <AlertCircle className="w-6 h-6 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5 sm:mt-0" />
+              <div className="flex-1">
+                <h4 className="text-sm sm:text-base font-bold text-rose-700 dark:text-rose-300">
+                  Aviso: Este evento se encuentra Cancelado
+                </h4>
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-0.5">
+                  {event.cancellationReason
+                    ? `Motivo de cancelación: ${event.cancellationReason}`
+                    : 'La fecha o actividades de este evento han sido suspendidas. No se emiten nuevos pases.'}
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Host Referrer Banner */}
           {referrer && (
             <div className="p-4 rounded-2xl bg-gradient-to-r from-sky-50 via-white to-sky-50 dark:from-sky-950/60 dark:via-slate-900 dark:to-sky-950/60 border border-sky-200 dark:border-sky-500/40 flex items-center justify-between flex-wrap gap-3 shadow-md">
@@ -276,7 +293,32 @@ export const LandingPage: React.FC = () => {
               </p>
             </div>
 
-            {stats?.isSoldOut ? (
+            {event.status === 'cancelled' ? (
+              <div className="p-8 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border-2 border-rose-500/50 text-center space-y-4">
+                <div className="w-14 h-14 rounded-full bg-rose-100 dark:bg-rose-900/60 text-rose-600 dark:text-rose-300 flex items-center justify-center mx-auto">
+                  <AlertCircle className="w-8 h-8" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-xl font-bold text-rose-700 dark:text-rose-300">Este Evento ha sido Cancelado</h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-300">
+                    El organizador ha cancelado este evento. Ya no se aceptan nuevos registros.
+                  </p>
+                  {event.cancellationReason && (
+                    <p className="text-xs text-rose-800 dark:text-rose-400 bg-rose-100 dark:bg-rose-900/30 p-3 rounded-xl border border-rose-200 dark:border-rose-800/40 mt-3 font-medium">
+                      Motivo informado: <em>"{event.cancellationReason}"</em>
+                    </p>
+                  )}
+                </div>
+                <div className="pt-2">
+                  <Link
+                    to="/"
+                    className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 text-xs font-bold transition-all"
+                  >
+                    <span>Ver Próximos Eventos Disponibles</span>
+                  </Link>
+                </div>
+              </div>
+            ) : stats?.isSoldOut ? (
               <div className="p-6 rounded-2xl bg-rose-500/20 border border-rose-500 text-center space-y-2">
                 <AlertCircle className="w-10 h-10 text-rose-500 mx-auto" />
                 <h3 className="text-lg font-bold text-rose-700 dark:text-white">Aforo Completo</h3>

@@ -1,6 +1,8 @@
 import {
   EventItem,
   TicketTypeItem,
+  CreateTicketTypePayload,
+  UpdateTicketTypePayload,
   TicketItem,
   EventStatsData,
   RegisterTicketPayload,
@@ -61,6 +63,43 @@ export const api = {
     const res = await fetch(`${API_BASE}/events`);
     const data = await res.json();
     return data.events || [];
+  },
+
+  async getEventsCategorized(): Promise<{
+    events: EventItem[];
+    upcoming: EventItem[];
+    past: EventItem[];
+    cancelled: EventItem[];
+  }> {
+    const res = await fetch(`${API_BASE}/events`);
+    const data = await res.json();
+    return {
+      events: data.events || [],
+      upcoming: data.upcoming || [],
+      past: data.past || [],
+      cancelled: data.cancelled || [],
+    };
+  },
+
+  async cancelEvent(id: string, reason?: string): Promise<{ event: EventItem; message: string }> {
+    const res = await fetch(`${API_BASE}/events/${id}/cancel`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ reason }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Error al cancelar evento');
+    return data;
+  },
+
+  async reactivateEvent(id: string): Promise<{ event: EventItem; message: string }> {
+    const res = await fetch(`${API_BASE}/events/${id}/reactivate`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Error al reactivar evento');
+    return data;
   },
 
   async getEventBySlug(
@@ -185,6 +224,63 @@ export const api = {
     const res = await fetch(`${API_BASE}/tickets/${code}`);
     if (!res.ok) throw new Error('Ticket no encontrado');
     return res.json();
+  },
+
+  async resendTicketEmail(ticketId: string, email?: string): Promise<{ message: string; previewUrl?: string }> {
+    const res = await fetch(`${API_BASE}/tickets/${ticketId}/send-email`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ email }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Error al enviar correo');
+    return data;
+  },
+
+  async sendTicketEmail(ticketId: string, email?: string): Promise<{ message: string; previewUrl?: string }> {
+    return this.resendTicketEmail(ticketId, email);
+  },
+
+  // Mantenedor de Tipos de Entrada
+  async getTicketTypes(eventId?: string): Promise<TicketTypeItem[]> {
+    const url = eventId
+      ? `${API_BASE}/ticket-types?eventId=${encodeURIComponent(eventId)}`
+      : `${API_BASE}/ticket-types`;
+    const res = await fetch(url, { headers: getAuthHeaders() });
+    const data = await res.json();
+    return data.ticketTypes || [];
+  },
+
+  async createTicketType(payload: CreateTicketTypePayload): Promise<{ ticketType: TicketTypeItem; message: string }> {
+    const res = await fetch(`${API_BASE}/ticket-types`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Error al crear tipo de entrada');
+    return data;
+  },
+
+  async updateTicketType(id: string, payload: UpdateTicketTypePayload): Promise<{ ticketType: TicketTypeItem; message: string }> {
+    const res = await fetch(`${API_BASE}/ticket-types/${id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Error al actualizar tipo de entrada');
+    return data;
+  },
+
+  async deleteTicketType(id: string): Promise<{ message: string }> {
+    const res = await fetch(`${API_BASE}/ticket-types/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Error al eliminar tipo de entrada');
+    return data;
   },
 
   // Mantenedor de Socios / Usuarios

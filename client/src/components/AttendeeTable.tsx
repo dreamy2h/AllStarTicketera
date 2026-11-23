@@ -10,10 +10,11 @@ import {
   MessageSquare,
   QrCode,
   User,
+  Mail,
 } from 'lucide-react';
 import { TicketItem, User as PartnerUser } from '../types/index.js';
 import { api } from '../services/api.js';
-import { generateWhatsAppTicketLink } from '../services/whatsapp.js';
+import { generateWhatsAppTicketLink, shareTicketWithQRImage } from '../services/whatsapp.js';
 
 interface AttendeeTableProps {
   attendees: TicketItem[];
@@ -34,6 +35,9 @@ export const AttendeeTable: React.FC<AttendeeTableProps> = ({
   const [selectedPartnerId, setSelectedPartnerId] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [checkingInCode, setCheckingInCode] = useState<string | null>(null);
+  const [sendingEmailCode, setSendingEmailCode] = useState<string | null>(null);
+  const [feedbackNotice, setFeedbackNotice] = useState<string | null>(null);
+  const [previewEmailLink, setPreviewEmailLink] = useState<string | null>(null);
   const [isExporting, setIsExporting] = useState(false);
 
   // Client-side quick filter
@@ -83,8 +87,68 @@ export const AttendeeTable: React.FC<AttendeeTableProps> = ({
     }
   };
 
+  const handleSendEmail = async (code: string, email: string) => {
+    try {
+      setSendingEmailCode(code);
+      setFeedbackNotice(null);
+      setPreviewEmailLink(null);
+      const res = await api.sendTicketEmail(code);
+      if (res.previewUrl) {
+        setPreviewEmailLink(res.previewUrl);
+        setFeedbackNotice(`✉️ Invitación generada para ${email}`);
+      } else {
+        setFeedbackNotice(`✉️ ${res.message || `Invitación enviada a ${email}`}`);
+      }
+      setTimeout(() => setFeedbackNotice(null), 8000);
+    } catch (err: any) {
+      setFeedbackNotice(`⚠️ ${err.message || 'Error al enviar invitación'}`);
+      setTimeout(() => setFeedbackNotice(null), 5000);
+    } finally {
+      setSendingEmailCode(null);
+    }
+  };
+
+  const handleShareWhatsApp = async (t: TicketItem) => {
+    try {
+      const partner = typeof t.invitedByUserId === 'object' ? t.invitedByUserId : null;
+      const event = typeof t.eventId === 'object' ? t.eventId : null;
+
+      const res = await shareTicketWithQRImage({
+        phone: t.attendeePhone,
+        attendeeName: t.attendeeName,
+        eventName: event?.title || 'Evento AllStar',
+        ticketCode: t.ticketCode,
+        ticketViewUrl: `${window.location.origin}/ticket/${t.ticketCode}`,
+        referrerName: partner?.fullName,
+      });
+
+      setFeedbackNotice(res.message);
+      setTimeout(() => setFeedbackNotice(null), 6000);
+    } catch (err: any) {
+      console.error('Error al compartir por WhatsApp:', err);
+    }
+  };
+
   return (
     <div className="card-luxury rounded-2xl border border-white/10 overflow-hidden">
+      {feedbackNotice && (
+        <div className="bg-amber-500/15 border-b border-amber-500/30 px-4 py-2.5 text-xs font-semibold text-slate-800 dark:text-amber-200 flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <span>{feedbackNotice}</span>
+            {previewEmailLink && (
+              <a
+                href={previewEmailLink}
+                target="_blank"
+                rel="noreferrer"
+                className="underline text-sky-600 dark:text-sky-300 font-bold ml-2 hover:opacity-80"
+              >
+                Abrir vista previa del correo ↗
+              </a>
+            )}
+          </div>
+          <button onClick={() => { setFeedbackNotice(null); setPreviewEmailLink(null); }} className="font-bold text-xs">✕</button>
+        </div>
+      )}
       {/* Controls Header */}
       <div className="p-5 border-b border-slate-200 dark:border-white/10 flex flex-col md:flex-row gap-4 items-center justify-between">
         {/* Search */}
@@ -270,16 +334,28 @@ export const AttendeeTable: React.FC<AttendeeTableProps> = ({
                           </button>
                         )}
 
-                        {/* WhatsApp Send Link */}
-                        <a
-                          href={whatsappUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                        {/* WhatsApp Send Link with automatic QR image download & copy */}
+                        <button
+                          onClick={() => handleShareWhatsApp(t)}
                           className="p-1.5 rounded-lg bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/30 border border-emerald-500/40 transition-colors"
-                          title="Enviar Pase por WhatsApp"
+                          title="Enviar Pase e Imagen QR por WhatsApp"
                         >
                           <MessageSquare className="w-3.5 h-3.5" />
-                        </a>
+                        </button>
+
+                        {/* Send Invitation Email Button */}
+                        <button
+                          onClick={() => handleSendEmail(t.ticketCode, t.attendeeEmail)}
+                          disabled={sendingEmailCode === t.ticketCode}
+                          className="p-1.5 rounded-lg bg-sky-500/20 text-sky-700 dark:text-sky-400 hover:bg-sky-500/30 border border-sky-500/40 transition-colors disabled:opacity-50"
+                          title="Enviar Invitación por Correo"
+                        >
+                          {sendingEmailCode === t.ticketCode ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          ) : (
+                            <Mail className="w-3.5 h-3.5" />
+                          )}
+                        </button>
 
                         {/* View Boarding Pass Modal */}
                         <button

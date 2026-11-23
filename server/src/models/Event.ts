@@ -1,5 +1,7 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
+export type EventStatus = 'active' | 'cancelled' | 'completed';
+
 export interface IEvent extends Document {
   title: string;
   slug: string;
@@ -10,6 +12,9 @@ export interface IEvent extends Document {
   guestLeaders: string[];
   capacityLimit?: number | null;
   isActive: boolean;
+  status: EventStatus;
+  cancellationReason?: string | null;
+  cancelledAt?: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -58,6 +63,19 @@ const EventSchema = new Schema<IEvent>(
     isActive: {
       type: Boolean,
       default: true,
+    },
+    status: {
+      type: String,
+      enum: ['active', 'cancelled', 'completed'],
+      default: 'active',
+    },
+    cancellationReason: {
+      type: String,
+      default: null,
+    },
+    cancelledAt: {
+      type: Date,
+      default: null,
     },
   },
   {
