@@ -169,7 +169,7 @@ export const AttendeeTable: React.FC<AttendeeTableProps> = ({
           <select
             value={selectedPartnerId}
             onChange={(e) => setSelectedPartnerId(e.target.value)}
-            className="bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs text-slate-800 dark:text-white rounded-xl px-3 py-2 focus:outline-none focus:border-amber-500"
+            className="w-full sm:w-auto max-w-full truncate bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs text-slate-800 dark:text-white rounded-xl px-3 py-2 focus:outline-none focus:border-amber-500"
           >
             <option value="all">Todos los Socios</option>
             <option value="direct">Directo / Sin Referidor</option>
@@ -184,7 +184,7 @@ export const AttendeeTable: React.FC<AttendeeTableProps> = ({
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs text-slate-800 dark:text-white rounded-xl px-3 py-2 focus:outline-none focus:border-amber-500"
+            className="w-full sm:w-auto max-w-full truncate bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs text-slate-800 dark:text-white rounded-xl px-3 py-2 focus:outline-none focus:border-amber-500"
           >
             <option value="all">Todos los Estados</option>
             <option value="registered">Inscritos (Pendientes)</option>

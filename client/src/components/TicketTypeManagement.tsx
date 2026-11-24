@@ -232,15 +232,15 @@ export const TicketTypeManagement: React.FC<TicketTypeManagementProps> = ({
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto min-w-0">
           {/* Event Selector */}
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 w-full sm:w-auto min-w-0 max-w-full">
             <Calendar className="w-4 h-4 text-slate-400 shrink-0" />
             <select
               value={selectedEventId}
               onChange={(e) => setSelectedEventId(e.target.value)}
               disabled={isLoadingEvents}
-              className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs font-semibold text-slate-900 dark:text-white rounded-xl px-3 py-2 focus:outline-none focus:border-amber-500 shadow-sm"
+              className="w-full sm:w-auto max-w-full truncate bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs font-semibold text-slate-900 dark:text-white rounded-xl px-3 py-2 focus:outline-none focus:border-amber-500 shadow-sm"
             >
               {events.map((e) => (
                 <option key={e._id} value={e._id}>

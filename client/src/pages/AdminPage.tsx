@@ -387,21 +387,21 @@ export const AdminPage: React.FC = () => {
       {activeTab === 'metrics' && (
         <div className="space-y-8">
           {activeEvent && (
-            <div className="p-4 rounded-2xl bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-white/10 shadow-sm flex flex-wrap items-center justify-between gap-4">
-              <div className="flex items-center space-x-3">
-                <div className="p-2.5 rounded-xl bg-amber-500/15 text-amber-700 dark:text-allstar-gold border border-amber-500/30">
+            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-white/10 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 w-full overflow-hidden">
+              <div className="flex items-center space-x-3 min-w-0">
+                <div className="p-2.5 rounded-xl bg-amber-500/15 text-amber-700 dark:text-allstar-gold border border-amber-500/30 shrink-0">
                   <Calendar className="w-5 h-5" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <span className="text-xs text-slate-500 dark:text-slate-400 font-mono uppercase block">Evento Seleccionado:</span>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-base font-bold text-slate-900 dark:text-white">{activeEvent.title}</span>
+                  <div className="flex items-center space-x-2 flex-wrap gap-1">
+                    <span className="text-base font-bold text-slate-900 dark:text-white break-words">{activeEvent.title}</span>
                     {activeEvent.status === 'cancelled' ? (
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 border border-rose-300 dark:border-rose-700/50 font-bold">
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 border border-rose-300 dark:border-rose-700/50 font-bold shrink-0">
                         Cancelado
                       </span>
                     ) : (
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700/50 font-bold">
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700/50 font-bold shrink-0">
                         Activo
                       </span>
                     )}
@@ -409,51 +409,55 @@ export const AdminPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center gap-3 text-xs font-mono">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 text-xs font-mono w-full md:w-auto min-w-0">
                 {events.length > 1 && (
-                  <select
-                    value={selectedEventId}
-                    onChange={(e) => setSelectedEventId(e.target.value)}
-                    className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs text-slate-800 dark:text-white rounded-xl px-3 py-1.5 focus:outline-none focus:border-amber-500"
-                  >
-                    {events.map((e) => (
-                      <option key={e._id} value={e._id}>
-                        {e.title} ({e.city}) {e.status === 'cancelled' ? '[CANCELADO]' : ''}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="w-full sm:w-auto min-w-0 max-w-full">
+                    <select
+                      value={selectedEventId}
+                      onChange={(e) => setSelectedEventId(e.target.value)}
+                      className="w-full sm:w-auto max-w-full truncate bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs text-slate-800 dark:text-white rounded-xl px-3 py-2 focus:outline-none focus:border-amber-500 font-sans font-medium shadow-sm"
+                    >
+                      {events.map((e) => (
+                        <option key={e._id} value={e._id}>
+                          {e.title} ({e.city}) {e.status === 'cancelled' ? '[CANCELADO]' : ''}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 )}
 
-                <Can do="events:create">
-                  {activeEvent.status === 'cancelled' ? (
-                    <button
-                      onClick={handleReactivateEvent}
-                      className="flex items-center space-x-1 px-3 py-1.5 rounded-xl bg-emerald-100 hover:bg-emerald-200 text-emerald-800 dark:bg-emerald-950 dark:hover:bg-emerald-900 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 text-xs font-bold transition-colors font-sans"
-                      title="Reactivar evento para volverlo visible y permitir registros"
-                    >
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span>Reactivar Evento</span>
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => setShowCancelModal(true)}
-                      className="flex items-center space-x-1 px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:hover:bg-rose-900/60 dark:text-rose-300 border border-rose-200 dark:border-rose-700/50 text-xs font-bold transition-colors font-sans"
-                      title="Cancelar evento"
-                    >
-                      <Ban className="w-3.5 h-3.5" />
-                      <span>Cancelar Evento</span>
-                    </button>
-                  )}
-                </Can>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Can do="events:create">
+                    {activeEvent.status === 'cancelled' ? (
+                      <button
+                        onClick={handleReactivateEvent}
+                        className="flex items-center space-x-1 px-3 py-2 rounded-xl bg-emerald-100 hover:bg-emerald-200 text-emerald-800 dark:bg-emerald-950 dark:hover:bg-emerald-900 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 text-xs font-bold transition-colors font-sans"
+                        title="Reactivar evento para volverlo visible y permitir registros"
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                        <span>Reactivar Evento</span>
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => setShowCancelModal(true)}
+                        className="flex items-center space-x-1 px-3 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:hover:bg-rose-900/60 dark:text-rose-300 border border-rose-200 dark:border-rose-700/50 text-xs font-bold transition-colors font-sans"
+                        title="Cancelar evento"
+                      >
+                        <Ban className="w-3.5 h-3.5 shrink-0" />
+                        <span>Cancelar Evento</span>
+                      </button>
+                    )}
+                  </Can>
 
-                <a
-                  href={`/eventos/${activeEvent.slug}?ref=${currentUser.referralCode}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-amber-600 dark:text-allstar-gold hover:underline font-bold"
-                >
-                  Mi Enlace Personal ↗
-                </a>
+                  <a
+                    href={`/eventos/${activeEvent.slug}?ref=${currentUser.referralCode}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-amber-600 dark:text-allstar-gold hover:underline font-bold font-sans py-1.5"
+                  >
+                    Mi Enlace Personal ↗
+                  </a>
+                </div>
               </div>
             </div>
           )}
