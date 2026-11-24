@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { Shield, Sparkles, Lock, Mail, Eye, EyeOff, AlertCircle, ArrowRight, UserCheck, Star } from 'lucide-react';
+import { Lock, Mail, Eye, EyeOff, AlertCircle, ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.js';
 import { useTheme } from '../context/ThemeContext.js';
 
@@ -39,21 +39,6 @@ export const LoginPage: React.FC = () => {
       navigate(from, { replace: true });
     } catch (err: any) {
       setError(err.message || 'Error al autenticar');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleQuickLogin = async (demoEmail: string) => {
-    setEmail(demoEmail);
-    setPassword('AllStar2026!');
-    setError(null);
-    try {
-      setIsLoading(true);
-      await login(demoEmail, 'AllStar2026!');
-      navigate(from, { replace: true });
-    } catch (err: any) {
-      setError(err.message || 'Error al iniciar sesión de demostración');
     } finally {
       setIsLoading(false);
     }
@@ -137,60 +122,6 @@ export const LoginPage: React.FC = () => {
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
-
-          {/* Quick Demo Logins Section */}
-          <div className="mt-6 pt-6 border-t border-slate-200 dark:border-white/10 space-y-2.5">
-            <span className="text-[10px] font-mono uppercase text-slate-500 dark:text-slate-400 tracking-wider block text-center font-semibold">
-              Acceso Rápido de Prueba (Demo Cuentas):
-            </span>
-
-            <div className="grid grid-cols-1 gap-2">
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('zamyr@allstarticket.com')}
-                disabled={isLoading}
-                className="p-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-300 text-left flex items-center justify-between text-xs transition-colors dark:bg-amber-500/10 dark:hover:bg-amber-500/20 dark:border-amber-500/30"
-              >
-                <div>
-                  <span className="font-bold text-slate-900 dark:text-white block">👑 Zamyr Pedreros (Admin)</span>
-                  <span className="text-[10px] text-amber-700 dark:text-amber-300 font-mono">Todos los permisos + Crear eventos</span>
-                </div>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-amber-200 text-amber-900 dark:bg-amber-500/30 dark:text-amber-200 font-bold">
-                  Admin
-                </span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('andrea.gomez@allstarticket.com')}
-                disabled={isLoading}
-                className="p-2.5 rounded-xl bg-sky-50 hover:bg-sky-100 border border-sky-300 text-left flex items-center justify-between text-xs transition-colors dark:bg-sky-500/10 dark:hover:bg-sky-500/20 dark:border-sky-500/30"
-              >
-                <div>
-                  <span className="font-bold text-slate-900 dark:text-white block">⭐ Andrea Gómez (Líder)</span>
-                  <span className="text-[10px] text-sky-700 dark:text-sky-300 font-mono">Permiso: Gestionar y Crear Nuevos Socios</span>
-                </div>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-sky-200 text-sky-900 dark:bg-sky-500/30 dark:text-sky-200 font-bold">
-                  Líder
-                </span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('carlos.m@allstarticket.com')}
-                disabled={isLoading}
-                className="p-2.5 rounded-xl bg-purple-50 hover:bg-purple-100 border border-purple-300 text-left flex items-center justify-between text-xs transition-colors dark:bg-purple-500/10 dark:hover:bg-purple-500/20 dark:border-purple-500/30"
-              >
-                <div>
-                  <span className="font-bold text-slate-900 dark:text-white block">🤝 Carlos Mendoza (Socio General)</span>
-                  <span className="text-[10px] text-purple-700 dark:text-purple-300 font-mono">Permiso: Invitar prospectos y ver sus tickets</span>
-                </div>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-purple-200 text-purple-900 dark:bg-purple-500/30 dark:text-purple-200 font-bold">
-                  Socio
-                </span>
-              </button>
-            </div>
-          </div>
         </div>
 
         <div className="text-center text-xs text-slate-500">
