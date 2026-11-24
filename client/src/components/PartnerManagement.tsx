@@ -171,7 +171,11 @@ export const PartnerManagement: React.FC = () => {
 
   const handleCopyCode = (code: string) => {
     const origin = window.location.origin;
-    const testLink = `${origin}/eventos/cumbre-cruceros-2026?ref=${code}`;
+    const currentEventMatch = window.location.pathname.match(/^\/eventos\/([^\/]+)/);
+    const slug = currentEventMatch ? currentEventMatch[1] : '';
+    const testLink = slug
+      ? `${origin}/eventos/${slug}?ref=${code}`
+      : `${origin}/?ref=${code}`;
     navigator.clipboard.writeText(testLink);
     setCopiedCode(code);
     setTimeout(() => setCopiedCode(null), 2500);

@@ -282,6 +282,7 @@ export const getEventAttendees = async (req: Request, res: Response): Promise<vo
     }
 
     const attendees = await Ticket.find(query)
+      .populate('eventId')
       .populate('invitedByUserId', 'fullName referralCode')
       .populate('ticketTypeId', 'name price')
       .sort({ createdAt: -1 });
@@ -318,7 +319,7 @@ export const resendTicketEmail = async (req: Request, res: Response): Promise<vo
     const result = await sendTicketConfirmationEmail({
       toEmail: (req.body && req.body.email) || ticket.attendeeEmail,
       attendeeName: ticket.attendeeName,
-      eventName: event ? event.title : 'Cumbre All-Star',
+      eventName: event ? event.title : 'Evento Oficial AllStar',
       eventDate: event ? event.eventDate : new Date(),
       venueName: event ? event.venueName : 'Recinto Oficial',
       city: event ? event.city : 'Sede Oficial',

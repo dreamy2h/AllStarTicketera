@@ -12,7 +12,7 @@ import {
   User,
   Mail,
 } from 'lucide-react';
-import { TicketItem, User as PartnerUser } from '../types/index.js';
+import { TicketItem, User as PartnerUser, EventItem } from '../types/index.js';
 import { api } from '../services/api.js';
 import { generateWhatsAppTicketLink, shareTicketWithQRImage } from '../services/whatsapp.js';
 
@@ -20,6 +20,7 @@ interface AttendeeTableProps {
   attendees: TicketItem[];
   partners: PartnerUser[];
   eventId: string;
+  event?: EventItem | null;
   onRefresh: () => void;
   onSelectTicketForPass: (ticket: TicketItem) => void;
 }
@@ -28,6 +29,7 @@ export const AttendeeTable: React.FC<AttendeeTableProps> = ({
   attendees,
   partners,
   eventId,
+  event: propEvent,
   onRefresh,
   onSelectTicketForPass,
 }) => {
@@ -111,12 +113,12 @@ export const AttendeeTable: React.FC<AttendeeTableProps> = ({
   const handleShareWhatsApp = async (t: TicketItem) => {
     try {
       const partner = typeof t.invitedByUserId === 'object' ? t.invitedByUserId : null;
-      const event = typeof t.eventId === 'object' ? t.eventId : null;
+      const ticketEvent = typeof t.eventId === 'object' && t.eventId ? t.eventId : propEvent;
 
       const res = await shareTicketWithQRImage({
         phone: t.attendeePhone,
         attendeeName: t.attendeeName,
-        eventName: event?.title || 'Evento AllStar',
+        eventName: ticketEvent?.title || 'Evento Oficial AllStar',
         ticketCode: t.ticketCode,
         ticketViewUrl: `${window.location.origin}/ticket/${t.ticketCode}`,
         referrerName: partner?.fullName,
@@ -232,12 +234,12 @@ export const AttendeeTable: React.FC<AttendeeTableProps> = ({
               filteredAttendees.map((t) => {
                 const partner = typeof t.invitedByUserId === 'object' ? t.invitedByUserId : null;
                 const ticketType = typeof t.ticketTypeId === 'object' ? t.ticketTypeId : null;
-                const event = typeof t.eventId === 'object' ? t.eventId : null;
+                const ticketEvent = typeof t.eventId === 'object' && t.eventId ? t.eventId : propEvent;
 
                 const whatsappUrl = generateWhatsAppTicketLink({
                   phone: t.attendeePhone,
                   attendeeName: t.attendeeName,
-                  eventName: event?.title || 'Evento AllStar',
+                  eventName: ticketEvent?.title || 'Evento Oficial AllStar',
                   ticketCode: t.ticketCode,
                   ticketViewUrl: `${window.location.origin}/ticket/${t.ticketCode}`,
                   referrerName: partner?.fullName,
@@ -248,7 +250,7 @@ export const AttendeeTable: React.FC<AttendeeTableProps> = ({
                     {/* Code */}
                     <td className="py-3 px-4">
                       <button
-                        onClick={() => onSelectTicketForPass(t)}
+                        onClick={() => onSelectTicketForPass(typeof t.eventId === 'string' && propEvent ? { ...t, eventId: propEvent } : t)}
                         className="font-mono text-xs font-bold text-amber-600 dark:text-allstar-gold hover:underline flex items-center space-x-1"
                       >
                         <QrCode className="w-3.5 h-3.5" />

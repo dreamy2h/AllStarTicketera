@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { X, UserPlus, Sparkles, AlertCircle } from 'lucide-react';
-import { TicketTypeItem, User as PartnerUser, TicketItem } from '../types/index.js';
+import { TicketTypeItem, User as PartnerUser, TicketItem, EventItem } from '../types/index.js';
 import { api } from '../services/api.js';
 import { BoardingPass } from './BoardingPass.js';
 
 interface ManualTicketModalProps {
   eventId: string;
+  event?: EventItem | null;
   ticketTypes: TicketTypeItem[];
   partners: PartnerUser[];
   onClose: () => void;
@@ -14,6 +15,7 @@ interface ManualTicketModalProps {
 
 export const ManualTicketModal: React.FC<ManualTicketModalProps> = ({
   eventId,
+  event,
   ticketTypes,
   partners,
   onClose,
@@ -87,7 +89,7 @@ export const ManualTicketModal: React.FC<ManualTicketModalProps> = ({
 
           {createdTicket ? (
             <div className="space-y-6">
-              <BoardingPass ticket={createdTicket} showActions={true} />
+              <BoardingPass ticket={createdTicket} event={event} showActions={true} />
               <button
                 onClick={onClose}
                 className="w-full py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-white font-semibold text-sm transition-all"

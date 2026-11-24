@@ -38,7 +38,11 @@ export const Navbar: React.FC = () => {
   const handleCopyMyReferral = () => {
     if (!user) return;
     const origin = window.location.origin;
-    const refLink = `${origin}/eventos/cumbre-cruceros-2026?ref=${user.referralCode}`;
+    const currentEventMatch = location.pathname.match(/^\/eventos\/([^\/]+)/);
+    const slug = currentEventMatch ? currentEventMatch[1] : '';
+    const refLink = slug
+      ? `${origin}/eventos/${slug}?ref=${user.referralCode}`
+      : `${origin}/?ref=${user.referralCode}`;
     navigator.clipboard.writeText(refLink);
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 2500);

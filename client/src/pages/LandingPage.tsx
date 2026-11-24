@@ -164,7 +164,7 @@ export const LandingPage: React.FC = () => {
           </div>
 
           {/* Boarding Pass Component */}
-          <BoardingPass ticket={createdTicket} showActions={true} />
+          <BoardingPass ticket={createdTicket} event={event} showActions={true} />
 
           <div className="text-center pt-4">
             <button

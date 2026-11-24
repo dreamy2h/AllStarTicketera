@@ -476,6 +476,7 @@ export const AdminPage: React.FC = () => {
               attendees={attendees}
               partners={partners}
               eventId={selectedEventId}
+              event={activeEvent}
               onRefresh={handleRefresh}
               onSelectTicketForPass={(ticket) => setPreviewTicket(ticket)}
             />
@@ -533,6 +534,7 @@ export const AdminPage: React.FC = () => {
             attendees={myAttendees}
             partners={partners}
             eventId={selectedEventId}
+            event={activeEvent}
             onRefresh={handleRefresh}
             onSelectTicketForPass={(ticket) => setPreviewTicket(ticket)}
           />
@@ -599,6 +601,7 @@ export const AdminPage: React.FC = () => {
       {showManualModal && activeEvent && (
         <ManualTicketModal
           eventId={selectedEventId}
+          event={activeEvent}
           ticketTypes={ticketTypes}
           partners={partners.length > 0 ? partners : [currentUser]}
           onClose={() => setShowManualModal(false)}
@@ -626,7 +629,7 @@ export const AdminPage: React.FC = () => {
             >
               <X className="w-5 h-5" />
             </button>
-            <BoardingPass ticket={previewTicket} showActions={true} />
+            <BoardingPass ticket={previewTicket} event={activeEvent} showActions={true} />
           </div>
         </div>
       )}

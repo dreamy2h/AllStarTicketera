@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { toPng } from 'html-to-image';
 import {
@@ -16,16 +16,17 @@ import {
   Loader2,
   AlertTriangle,
 } from 'lucide-react';
-import { TicketItem } from '../types/index.js';
+import { TicketItem, EventItem } from '../types/index.js';
 import { generateWhatsAppTicketLink, shareTicketWithQRImage } from '../services/whatsapp.js';
 import { api } from '../services/api.js';
 
 interface BoardingPassProps {
   ticket: TicketItem;
+  event?: EventItem | null;
   showActions?: boolean;
 }
 
-export const BoardingPass: React.FC<BoardingPassProps> = ({ ticket, showActions = true }) => {
+export const BoardingPass: React.FC<BoardingPassProps> = ({ ticket, event: propEvent, showActions = true }) => {
   const passRef = useRef<HTMLDivElement>(null);
   const [isDownloading, setIsDownloading] = useState(false);
   const [isSharingWhatsapp, setIsSharingWhatsapp] = useState(false);
@@ -34,25 +35,52 @@ export const BoardingPass: React.FC<BoardingPassProps> = ({ ticket, showActions 
   const [emailPreviewUrl, setEmailPreviewUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
+  // Dynamically resolve event: from prop, populated ticket.eventId, or fetch by code
+  const [resolvedEvent, setResolvedEvent] = useState<EventItem | null>(() => {
+    if (propEvent) return propEvent;
+    if (typeof ticket.eventId === 'object' && ticket.eventId) return ticket.eventId;
+    return null;
+  });
+
+  useEffect(() => {
+    if (propEvent) {
+      setResolvedEvent(propEvent);
+    } else if (typeof ticket.eventId === 'object' && ticket.eventId) {
+      setResolvedEvent(ticket.eventId);
+    } else if (ticket.ticketCode) {
+      api.getTicketByCode(ticket.ticketCode)
+        .then((res) => {
+          if (res.ticket && typeof res.ticket.eventId === 'object' && res.ticket.eventId) {
+            setResolvedEvent(res.ticket.eventId);
+          }
+        })
+        .catch((e) => console.warn('No se pudo cargar evento para BoardingPass:', e));
+    }
+  }, [ticket, propEvent]);
+
   // Cast populated fields
-  const event = typeof ticket.eventId === 'object' ? ticket.eventId : null;
+  const event = resolvedEvent;
   const ticketType = typeof ticket.ticketTypeId === 'object' ? ticket.ticketTypeId : null;
   const referrer = typeof ticket.invitedByUserId === 'object' && ticket.invitedByUserId ? ticket.invitedByUserId : null;
 
   const isCancelled = event?.status === 'cancelled';
 
-  const eventDate = event?.eventDate ? new Date(event.eventDate) : new Date();
-  const dateFormatted = eventDate.toLocaleDateString('es-ES', {
-    weekday: 'short',
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  }).toUpperCase();
+  const eventDate = event?.eventDate ? new Date(event.eventDate) : null;
+  const dateFormatted = eventDate
+    ? eventDate.toLocaleDateString('es-ES', {
+        weekday: 'short',
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      }).toUpperCase()
+    : 'POR CONFIRMAR';
 
-  const timeFormatted = eventDate.toLocaleTimeString('es-ES', {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  const timeFormatted = eventDate
+    ? eventDate.toLocaleTimeString('es-ES', {
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+    : '--:--';
 
   const clientUrl = window.location.origin;
   const ticketUrl = `${clientUrl}/ticket/${ticket.ticketCode}`;
@@ -110,7 +138,7 @@ export const BoardingPass: React.FC<BoardingPassProps> = ({ ticket, showActions 
         {
           phone: ticket.attendeePhone,
           attendeeName: ticket.attendeeName,
-          eventName: event?.title || 'Cumbre All-Star',
+          eventName: event?.title || 'Evento Oficial AllStar',
           ticketCode: ticket.ticketCode,
           ticketViewUrl: ticketUrl,
           referrerName: referrer?.fullName,
@@ -205,11 +233,15 @@ export const BoardingPass: React.FC<BoardingPassProps> = ({ ticket, showActions 
                 <span>Destino Exclusivo</span>
               </div>
               <h3 className="text-xl sm:text-2xl font-bold font-luxury text-white leading-tight">
-                {event?.title || 'Cumbre All-Star 2026'}
+                {event?.title || 'Evento Oficial AllStar'}
               </h3>
               <div className="flex items-center text-xs text-slate-300 mt-1 font-medium">
                 <MapPin className="w-3.5 h-3.5 text-allstar-gold mr-1 shrink-0" />
-                <span>{event?.venueName} • {event?.city}</span>
+                <span>
+                  {event?.venueName
+                    ? `${event.venueName}${event.city ? ` • ${event.city}` : ''}`
+                    : (event?.city || 'Sede Oficial')}
+                </span>
               </div>
             </div>
 
@@ -280,7 +312,9 @@ export const BoardingPass: React.FC<BoardingPassProps> = ({ ticket, showActions 
             <div className="flex items-center justify-between text-xs text-slate-400 pt-1">
               <div>
                 <span className="font-mono text-[10px] uppercase text-slate-500 block">Dirección:</span>
-                <span className="text-slate-300 text-[11px] truncate block max-w-xs">{event?.venueAddress}</span>
+                <span className="text-slate-300 text-[11px] truncate block max-w-xs">
+                  {event?.venueAddress || event?.city || 'Sede Oficial'}
+                </span>
               </div>
               <div className="text-right">
                 <span className="font-mono text-[10px] uppercase text-slate-500 block">Identificador:</span>
